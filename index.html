@@ -381,11 +381,11 @@
     <div class="contact-grid">
       <div class="contact-card">
         <div class="ico">📱</div><h4>واتساب</h4>
-        <a href="https://wa.me/966580700000" target="_blank">+966 58 070 0000</a>
+        <a href="https://wa.me/966580700000" target="_blank" class="wa-link">+966 58 070 0000</a>
       </div>
       <div class="contact-card">
         <div class="ico">✉️</div><h4>البريد الإلكتروني</h4>
-        <a href="mailto:mtjrars805@gmail.com">mtjrars805@gmail.com</a>
+        <a href="mailto:mtjrars805@gmail.com" class="email-link">mtjrars805@gmail.com</a>
       </div>
       <div class="contact-card">
         <div class="ico">🕐</div><h4>ساعات العمل</h4>
@@ -403,7 +403,7 @@
     <div class="faq-item" onclick="toggleFaq(this)"><h4>هل التغليف سري ومجهول؟ <span class="chev">▼</span></h4><p>بالتأكيد. جميع المنتجات تُشحن في تغليف محايد تماماً بدون أي علامات.</p></div>
     <div class="faq-item" onclick="toggleFaq(this)"><h4>هل المنتجات أصلية وآمنة؟ <span class="chev">▼</span></h4><p>نعم، جميع منتجاتنا أصلية 100% ومصنوعة من مواد آمنة وصديقة للبشرة.</p></div>
     <div class="faq-item" onclick="toggleFaq(this)"><h4>كم تستغرق مدة التوصيل؟ <span class="chev">▼</span></h4><p>عادة ما تستغرق من 2 إلى 5 أيام عمل حسب المنطقة.</p></div>
-    <div class="faq-item" onclick="toggleFaq(this)"><h4>كيف أتواصل معكم؟ <span class="chev">▼</span></h4><p>عبر واتساب +966580700000 أو البريد mtjrars805@gmail.com.</p></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><h4>كيف أتواصل معكم؟ <span class="chev">▼</span></h4><p>عبر واتساب أو البريد الإلكتروني.</p></div>
   </div>
 </div>
 
@@ -415,8 +415,8 @@
   </div>
   <p style="color:#888;font-size:13px;line-height:1.9;max-width:600px;margin:0 auto 12px;">متجرك الموثوق لمستلزمات الأزواج في المملكة العربية السعودية. نقدم منتجات أصلية بجودة عالية وسرية تامة.</p>
   <div style="display:flex;gap:14px;justify-content:center;margin:20px 0;">
-    <a href="https://wa.me/966580700000" target="_blank" style="width:42px;height:42px;border-radius:50%;background:var(--dark-3);border:1px solid rgba(255,20,147,.3);display:flex;align-items:center;justify-content:center;color:var(--pink);">💬</a>
-    <a href="mailto:mtjrars805@gmail.com" style="width:42px;height:42px;border-radius:50%;background:var(--dark-3);border:1px solid rgba(255,20,147,.3);display:flex;align-items:center;justify-content:center;color:var(--pink);">✉️</a>
+    <a href="https://wa.me/966580700000" target="_blank" class="wa-link" style="width:42px;height:42px;border-radius:50%;background:var(--dark-3);border:1px solid rgba(255,20,147,.3);display:flex;align-items:center;justify-content:center;color:var(--pink);">💬</a>
+    <a href="mailto:mtjrars805@gmail.com" class="email-link" style="width:42px;height:42px;border-radius:50%;background:var(--dark-3);border:1px solid rgba(255,20,147,.3);display:flex;align-items:center;justify-content:center;color:var(--pink);">✉️</a>
   </div>
   <div style="border-top:1px solid rgba(255,20,147,.15);padding-top:20px;margin-top:20px;color:#666;font-size:12px;">© 2025 بوتيك السعادة - جميع الحقوق محفوظة</div>
 </footer>
@@ -429,7 +429,7 @@
   <button class="nav-btn" id="bnav-account" onclick="showPage('about')"><span class="nav-ico">👤</span>حسابي</button>
 </nav>
 
-<a href="https://wa.me/966580700000" style="position:fixed;bottom:100px;left:24px;z-index:1400;width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.5);" target="_blank">💬</a>
+<a href="https://wa.me/966580700000" class="wa-link" style="position:fixed;bottom:100px;left:24px;z-index:1400;width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.5);" target="_blank">💬</a>
 
 <div class="toast" id="toast">✅ تمت الإضافة</div>
 
@@ -453,11 +453,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+/* ========== الإعدادات الديناميكية ========== */
+let storeSettings = {
+  storeName: 'بوتيك السعادة',
+  whatsapp: '+966580700000',
+  email: 'mtjrars805@gmail.com'
+};
+
 /* ========== EmailJS ========== */
 const EMAILJS_PUBLIC_KEY = '6rU-1V9aPUnGP0wNW';
 const EMAILJS_SERVICE_ID = 'service_yoe182u';
 const EMAILJS_TEMPLATE_ID = 'template_ycsjuwa';
-const OWNER_EMAIL = 'mtjrars805@gmail.com';
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
 /* ========== Products from Firestore ========== */
@@ -469,6 +475,62 @@ function saveCart(){localStorage.setItem('boutiqueCart', JSON.stringify(cart)); 
 function saveWishlist(){localStorage.setItem('boutiqueWishlist', JSON.stringify(wishlist));}
 function updateCartCount(){const count = cart.reduce((s,i)=>s+i.qty,0); const el = document.getElementById('cartCount'); if(el) el.textContent = count;}
 
+/* ========== تحميل الإعدادات من Firebase ========== */
+async function loadSettings(){
+  try {
+    const doc = await db.collection('settings').doc('main').get();
+    if(doc.exists){
+      const s = doc.data();
+      if(s.whatsapp) storeSettings.whatsapp = s.whatsapp;
+      if(s.email) storeSettings.email = s.email;
+      if(s.storeName) storeSettings.storeName = s.storeName;
+      applySettings();
+    }
+  } catch(err){ 
+    console.log('Settings load error:', err); 
+  }
+}
+
+/* ========== تطبيق الإعدادات ========== */
+function applySettings(){
+  const cleanNumber = storeSettings.whatsapp.replace(/[^0-9]/g, '');
+  
+  // تحديث جميع روابط الواتساب
+  document.querySelectorAll('.wa-link').forEach(a => {
+    a.href = 'https://wa.me/' + cleanNumber;
+  });
+  
+  // تحديث جميع روابط البريد
+  document.querySelectorAll('.email-link').forEach(a => {
+    a.href = 'mailto:' + storeSettings.email;
+    if(a.textContent.includes('@')){
+      a.textContent = storeSettings.email;
+    }
+  });
+  
+  // تحديث نص رقم الواتساب في بطاقة الاتصال
+  document.querySelectorAll('.contact-card a').forEach(a => {
+    const text = a.textContent.trim();
+    if(/^\+?\d[\d\s]+$/.test(text)){
+      a.textContent = storeSettings.whatsapp;
+    }
+  });
+}
+
+/* ========== مراقبة تغييرات الإعدادات مباشرة ========== */
+function watchSettings(){
+  db.collection('settings').doc('main').onSnapshot(doc => {
+    if(doc.exists){
+      const s = doc.data();
+      if(s.whatsapp) storeSettings.whatsapp = s.whatsapp;
+      if(s.email) storeSettings.email = s.email;
+      if(s.storeName) storeSettings.storeName = s.storeName;
+      applySettings();
+    }
+  });
+}
+
+/* ========== Products ========== */
 async function loadProducts(){
   try {
     const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
@@ -588,6 +650,9 @@ async function submitOrder(){
   const itemsText = cart.map(i=>'• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR').join('\n');
   const itemsHTML = cart.map(i=>'<div style="color:#ddd;padding:6px 0;border-bottom:1px dashed #333;">• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR</div>').join('');
 
+  // رقم الواتساب الديناميكي
+  const cleanNumber = storeSettings.whatsapp.replace(/[^0-9]/g, '');
+
   try {
     // حفظ الطلب في Firestore
     try {
@@ -607,12 +672,26 @@ async function submitOrder(){
     } catch(e){ console.log('Firestore order error:', e); }
 
     // إرسال البريد الإلكتروني
-    const templateParams = { email: OWNER_EMAIL, order_id: orderId, order_date: orderDate, customer_name: name, customer_phone: phone, customer_city: city, customer_district: district, customer_address: address, payment_method: payment, order_items: itemsHTML, order_total: total };
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    try {
+      const templateParams = { 
+        email: storeSettings.email, 
+        order_id: orderId, 
+        order_date: orderDate, 
+        customer_name: name, 
+        customer_phone: phone, 
+        customer_city: city, 
+        customer_district: district, 
+        customer_address: address, 
+        payment_method: payment, 
+        order_items: itemsHTML, 
+        order_total: total 
+      };
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    } catch(e){ console.log('Email error:', e); }
 
-    // إرسال واتساب
+    // إرسال واتساب بالرقم الديناميكي
     const waText = '🛍️ طلب جديد من بوتيك السعادة\n\n📋 رقم الطلب: '+orderId+'\n\n👤 الاسم: '+name+'\n📱 الجوال: '+phone+'\n🏙️ المدينة: '+city+'\n🏘️ الحي: '+district+'\n📍 العنوان الوطني: '+address+'\n💳 طريقة الدفع: '+payment+'\n\n📦 المنتجات:\n'+itemsText+'\n\n💰 الإجمالي: '+total+' SAR';
-    window.open('https://wa.me/966580700000?text=' + encodeURIComponent(waText), '_blank');
+    window.open('https://wa.me/' + cleanNumber + '?text=' + encodeURIComponent(waText), '_blank');
 
     cart = []; saveCart();
     alert('✅ تم إرسال طلبك بنجاح!\n📧 وصلنا طلبك على البريد\nسنتواصل معك قريباً');
@@ -621,7 +700,7 @@ async function submitOrder(){
     console.log(err);
     alert('⚠️ حدث خطأ في الإرسال. سيتم تحويلك لواتساب مباشرة.');
     const waText = '🛍️ طلب جديد\n\n👤 الاسم: '+name+'\n📱 الجوال: '+phone+'\n🏙️ المدينة: '+city+'\n🏘️ الحي: '+district+'\n📍 العنوان: '+address+'\n💳 الدفع: '+payment+'\n\n📦 المنتجات:\n'+itemsText+'\n\n💰 الإجمالي: '+total+' SAR';
-    window.open('https://wa.me/966580700000?text=' + encodeURIComponent(waText), '_blank');
+    window.open('https://wa.me/' + cleanNumber + '?text=' + encodeURIComponent(waText), '_blank');
     cart = []; saveCart(); showPage('home');
   } finally { btn.innerHTML = oldText; btn.disabled = false; }
 }
@@ -670,13 +749,4 @@ function openModal(id){
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal(){ document.getElementById('productModal').classList.remove('active'); document.body.style.overflow = ''; }
-function toggleFaq(el){ el.classList.toggle('open'); }
-function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), 2200); }
-
-// Init
-updateCartCount();
-loadProducts();
-</script>
-</body>
-</html>
+function closeModal(){ document.getElementById('productModal').classList.remo
