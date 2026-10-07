@@ -282,13 +282,15 @@
     </div>
     <div class="form-group">
       <label>رقم الواتساب</label>
-      <input type="text" value="+966580700000" id="setWhatsapp" dir="ltr">
+      <input type="text" value="+966580700000" id="setWhatsapp" dir="ltr" placeholder="+966XXXXXXXXX">
+      <div class="form-hint">⚠️ ابدأ بـ +966 ثم الرقم كاملاً بدون مسافات</div>
     </div>
     <div class="form-group">
       <label>البريد الإلكتروني</label>
       <input type="email" value="mtjrars805@gmail.com" id="setEmail" dir="ltr">
     </div>
     <button class="btn-save" style="width:100%" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+    <div class="form-hint" style="text-align:center;margin-top:14px;color:var(--pink);">✨ التغييرات ستظهر في المتجر فوراً</div>
   </div>
 </div>
 
@@ -317,6 +319,7 @@ function doLogin(){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
     sessionStorage.setItem('adminLoggedIn', '1');
+    loadSettings();
   } else {
     err.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
   }
@@ -339,6 +342,7 @@ function showAdminPage(name){
   document.getElementById('admin-' + name).classList.add('active');
   if(name === 'products') loadAdminProducts();
   if(name === 'orders') loadAdminOrders();
+  if(name === 'settings') loadSettings();
 }
 
 /* ========== Images (Base64) ========== */
@@ -530,14 +534,36 @@ async function loadAdminOrders(){
 /* ========== Settings ========== */
 async function saveSettings(){
   try {
+    const whatsapp = document.getElementById('setWhatsapp').value.trim();
+    const email = document.getElementById('setEmail').value.trim();
+    const storeName = document.getElementById('setStoreName').value.trim();
+    
     await db.collection('settings').doc('main').set({
-      storeName: document.getElementById('setStoreName').value,
-      whatsapp: document.getElementById('setWhatsapp').value,
-      email: document.getElementById('setEmail').value,
+      storeName: storeName || 'بوتيك السعادة',
+      whatsapp: whatsapp || '+966580700000',
+      email: email || 'mtjrars805@gmail.com',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert('✅ تم حفظ الإعدادات');
-  } catch(err) { alert('❌ خطأ: ' + err.message); }
+    }, { merge: true });
+    
+    alert('✅ تم حفظ الإعدادات بنجاح!\nستظهر التغييرات في المتجر فوراً');
+  } catch(err) { 
+    alert('❌ خطأ: ' + err.message); 
+  }
+}
+
+/* تحميل الإعدادات عند فتح اللوحة */
+async function loadSettings(){
+  try {
+    const doc = await db.collection('settings').doc('main').get();
+    if(doc.exists){
+      const s = doc.data();
+      if(s.storeName) document.getElementById('setStoreName').value = s.storeName;
+      if(s.whatsapp) document.getElementById('setWhatsapp').value = s.whatsapp;
+      if(s.email) document.getElementById('setEmail').value = s.email;
+    }
+  } catch(err){ 
+    console.log('Settings load error:', err); 
+  }
 }
 
 /* ========== Check Login ========== */
@@ -545,6 +571,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if(sessionStorage.getItem('adminLoggedIn') === '1'){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
+    loadSettings();
   }
 });
 </script>
