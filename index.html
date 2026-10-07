@@ -6,6 +6,8 @@
 <title>بوتيك السعادة | متجر مستلزمات الأزواج</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
   :root{--pink:#ff1493;--pink-light:#ff69b4;--pink-dark:#c71585;--purple:#9c27b0;--dark:#0a0a0a;--dark-2:#151515;--dark-3:#1e1e1e;--gold:#d4af37;}
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif;}
@@ -33,8 +35,6 @@
   @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .hero{position:relative;display:block;padding:0;background:url('https://raw.githubusercontent.com/salmkasm7358-cell/boutique-store/refs/heads/main/IMG-20261006-WA0000(1).jpg') center/cover no-repeat;min-height:400px;line-height:0;cursor:pointer;border-bottom:1px solid rgba(255,20,147,.3);}
   .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(10,10,10,.7) 100%);pointer-events:none;}
-  .hero-content{display:none;}
-  .hero-visual{display:none;}
   .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:rgba(255,20,147,.2);border-top:1px solid rgba(255,20,147,.3);border-bottom:1px solid rgba(255,20,147,.3);padding:15px 5%;}
   .feature{background:transparent;padding:15px 10px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;border-left:1px solid rgba(255,20,147,.2);}
   .feature:last-child{border-left:none;}
@@ -165,6 +165,7 @@
   .spec-list li span:first-child{color:var(--pink);font-weight:600;}
   .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(100px);background:linear-gradient(135deg,var(--pink),var(--pink-dark));color:#fff;padding:14px 28px;border-radius:50px;font-weight:700;font-size:15px;box-shadow:0 10px 30px rgba(255,20,147,.6);z-index:3000;transition:.4s;opacity:0;pointer-events:none;}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .loading{text-align:center;padding:40px;color:var(--pink);font-size:15px;}
   @media(max-width:768px){
     nav{display:none;}
     .hero{min-height:280px;}
@@ -230,7 +231,7 @@
   </section>
   <section style="background:linear-gradient(180deg,#0a0a0a,#150510);padding-top:15px;">
     <div class="section-title"><span class="crown">💎</span><h2>منتجات مميزة</h2></div>
-    <div class="products" id="featuredProducts"></div>
+    <div class="products" id="featuredProducts"><div class="loading">⏳ جاري التحميل...</div></div>
     <div style="text-align:center;margin-top:28px;">
       <button class="btn-pink" onclick="showPage('shop')">عرض كل المنتجات</button>
     </div>
@@ -265,7 +266,7 @@
   </section>
   <section style="background:linear-gradient(180deg,#0a0a0a,#150510);">
     <div class="section-title"><span class="crown">💎</span><h2>جميع المنتجات</h2></div>
-    <div class="products" id="allProducts"></div>
+    <div class="products" id="allProducts"><div class="loading">⏳ جاري التحميل...</div></div>
   </section>
 </div>
 
@@ -440,41 +441,26 @@
 </div>
 
 <script>
+/* ========== Firebase Config ========== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBPW_K2Kw-VARAQHPsSLT53Y0wPzxC6ATM",
+  authDomain: "boutique-saada.firebaseapp.com",
+  projectId: "boutique-saada",
+  storageBucket: "boutique-saada.firebasestorage.app",
+  messagingSenderId: "812086015531",
+  appId: "1:812086015531:web:70c6a4e0e0402659161c6e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ========== EmailJS ========== */
 const EMAILJS_PUBLIC_KEY = '6rU-1V9aPUnGP0wNW';
 const EMAILJS_SERVICE_ID = 'service_yoe182u';
 const EMAILJS_TEMPLATE_ID = 'template_ycsjuwa';
 const OWNER_EMAIL = 'mtjrars805@gmail.com';
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
-function openDB(){
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open('BoutiqueDB', 1);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains('products')){
-        const store = db.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
-        store.createIndex('cat', 'cat', { unique: false });
-      }
-      if(!db.objectStoreNames.contains('orders')){
-        const ostore = db.createObjectStore('orders', { keyPath: 'orderId', autoIncrement: true });
-        ostore.createIndex('date', 'date', { unique: false });
-      }
-    };
-    req.onsuccess = (e) => resolve(e.target.result);
-    req.onerror = (e) => reject(e.target.error);
-  });
-}
-
-async function getProducts(){
-  const db = await openDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction('products', 'readonly');
-    const req = tx.objectStore('products').getAll();
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => resolve([]);
-  });
-}
-
+/* ========== Products from Firestore ========== */
 let products = [];
 let cart = JSON.parse(localStorage.getItem('boutiqueCart') || '[]');
 let wishlist = JSON.parse(localStorage.getItem('boutiqueWishlist') || '[]');
@@ -482,6 +468,44 @@ let wishlist = JSON.parse(localStorage.getItem('boutiqueWishlist') || '[]');
 function saveCart(){localStorage.setItem('boutiqueCart', JSON.stringify(cart)); updateCartCount();}
 function saveWishlist(){localStorage.setItem('boutiqueWishlist', JSON.stringify(wishlist));}
 function updateCartCount(){const count = cart.reduce((s,i)=>s+i.qty,0); const el = document.getElementById('cartCount'); if(el) el.textContent = count;}
+
+async function loadProducts(){
+  try {
+    const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+    products = [];
+    snapshot.forEach(doc => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    renderAllProducts();
+  } catch(err) {
+    console.error('Error loading products:', err);
+    document.getElementById('featuredProducts').innerHTML = '<div class="loading" style="color:#ff4d4d;">❌ خطأ في تحميل المنتجات</div>';
+  }
+}
+
+function renderAllProducts(){
+  const featured = document.getElementById('featuredProducts');
+  const all = document.getElementById('allProducts');
+  
+  if(products.length === 0){
+    const emptyHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;font-size:15px;">لا توجد منتجات بعد. أدخل إلى <a href="admin.html" style="color:var(--pink);text-decoration:underline;">لوحة التحكم</a> لإضافة منتجات.</div>';
+    featured.innerHTML = emptyHTML;
+    all.innerHTML = emptyHTML;
+    return;
+  }
+  
+  featured.innerHTML = products.slice(0,6).map(productCardHTML).join('');
+  all.innerHTML = products.map(productCardHTML).join('');
+}
+
+/* Real-time updates */
+db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+  products = [];
+  snapshot.forEach(doc => {
+    products.push({ id: doc.id, ...doc.data() });
+  });
+  renderAllProducts();
+});
 
 function addToCart(id, event){
   const p = products.find(x=>x.id===id);
@@ -563,12 +587,33 @@ async function submitOrder(){
   const orderDate = new Date().toLocaleString('ar-SA');
   const itemsText = cart.map(i=>'• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR').join('\n');
   const itemsHTML = cart.map(i=>'<div style="color:#ddd;padding:6px 0;border-bottom:1px dashed #333;">• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR</div>').join('');
+
   try {
+    // حفظ الطلب في Firestore
+    try {
+      await db.collection('orders').add({
+        orderId: orderId,
+        date: orderDate,
+        customer: name,
+        phone: phone,
+        city: city,
+        district: district,
+        address: address,
+        payment: payment,
+        items: cart.map(i=>({name:i.name, qty:i.qty, price:i.price})),
+        total: total,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e){ console.log('Firestore order error:', e); }
+
+    // إرسال البريد الإلكتروني
     const templateParams = { email: OWNER_EMAIL, order_id: orderId, order_date: orderDate, customer_name: name, customer_phone: phone, customer_city: city, customer_district: district, customer_address: address, payment_method: payment, order_items: itemsHTML, order_total: total };
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-    try{ const db = await openDB(); const tx = db.transaction('orders', 'readwrite'); tx.objectStore('orders').add({ orderId: orderId, date: orderDate, customer: name, phone: phone, city: city, district: district, address: address, payment: payment, items: cart.map(i=>({name:i.name, qty:i.qty, price:i.price})), total: total }); } catch(e){ console.log(e); }
+
+    // إرسال واتساب
     const waText = '🛍️ طلب جديد من بوتيك السعادة\n\n📋 رقم الطلب: '+orderId+'\n\n👤 الاسم: '+name+'\n📱 الجوال: '+phone+'\n🏙️ المدينة: '+city+'\n🏘️ الحي: '+district+'\n📍 العنوان الوطني: '+address+'\n💳 طريقة الدفع: '+payment+'\n\n📦 المنتجات:\n'+itemsText+'\n\n💰 الإجمالي: '+total+' SAR';
     window.open('https://wa.me/966580700000?text=' + encodeURIComponent(waText), '_blank');
+
     cart = []; saveCart();
     alert('✅ تم إرسال طلبك بنجاح!\n📧 وصلنا طلبك على البريد\nسنتواصل معك قريباً');
     showPage('home');
@@ -610,7 +655,7 @@ function goToCategory(cat){
 function productCardHTML(p){
   const imgHTML = p.image ? '<img src="'+p.image+'" style="width:100%;height:100%;object-fit:cover;">' : '<div class="emoji">'+(p.emoji || '📦')+'</div>';
   const isFav = wishlist.includes(p.id);
-  return '<div class="product" onclick="openModal('+p.id+')"><div class="product-img">'+(p.badge ? '<div class="badge">'+p.badge+'</div>' : '')+'<div onclick="event.stopPropagation();toggleWishlist('+p.id+')" style="position:absolute;top:10px;left:10px;z-index:3;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid rgba(255,20,147,.5);">'+(isFav ? '❤️' : '🤍')+'</div>'+imgHTML+'</div><div class="product-info"><h4>'+p.name+'</h4>'+(p.shortDesc ? '<div class="short-desc">'+p.shortDesc+'</div>' : '')+'<div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' <span>SAR</span></div><div class="product-btns"><button class="add-btn" onclick="event.stopPropagation();addToCart('+p.id+', event)">🛒 أضف</button><button class="order-btn" onclick="event.stopPropagation();addToCart('+p.id+', event);showOrderForm()">⚡ اطلب الآن</button></div></div></div>';
+  return '<div class="product" onclick="openModal(\''+p.id+'\')"><div class="product-img">'+(p.badge ? '<div class="badge">'+p.badge+'</div>' : '')+'<div onclick="event.stopPropagation();toggleWishlist(\''+p.id+'\')" style="position:absolute;top:10px;left:10px;z-index:3;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid rgba(255,20,147,.5);">'+(isFav ? '❤️' : '🤍')+'</div>'+imgHTML+'</div><div class="product-info"><h4>'+p.name+'</h4>'+(p.shortDesc ? '<div class="short-desc">'+p.shortDesc+'</div>' : '')+'<div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' <span>SAR</span></div><div class="product-btns"><button class="add-btn" onclick="event.stopPropagation();addToCart(\''+p.id+'\', event)">🛒 أضف</button><button class="order-btn" onclick="event.stopPropagation();addToCart(\''+p.id+'\', event);showOrderForm()">⚡ اطلب الآن</button></div></div></div>';
 }
 
 function openModal(id){
@@ -620,7 +665,7 @@ function openModal(id){
   const specsHTML = p.specs ? Object.entries(p.specs).map(([k,v])=>'<li><span>'+k+'</span><span>'+v+'</span></li>').join('') : '';
   const sizesHTML = p.sizes && p.sizes.length ? p.sizes.map(s=>'<li><span>'+(s.size||'-')+'</span><span>'+(s.weight||'-')+'</span></li>').join('') : '';
   const imageHTML = p.image ? '<img src="'+p.image+'" alt="">' : p.emoji;
-  document.getElementById('modalContent').innerHTML = '<div class="img-side">'+imageHTML+'</div><div><h2>'+p.name+'</h2><div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' SAR</div><p>'+(p.desc||'')+'</p>'+(featuresHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المميزات:</h3><ul class="spec-list" style="border:none;">'+featuresHTML+'</ul>' : '')+(specsHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المواصفات:</h3><ul class="spec-list">'+specsHTML+'</ul>' : '')+(sizesHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المقاسات:</h3><ul class="spec-list">'+sizesHTML+'</ul>' : '')+'<div class="product-btns" style="margin-top:20px;"><button class="add-btn" onclick="addToCart('+p.id+', event);closeModal()">🛒 أضف للسلة</button><button class="order-btn" onclick="addToCart('+p.id+', event);closeModal();showOrderForm()">⚡ اطلب الآن</button></div></div>';
+  document.getElementById('modalContent').innerHTML = '<div class="img-side">'+imageHTML+'</div><div><h2>'+p.name+'</h2><div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' SAR</div><p>'+(p.desc||'')+'</p>'+(featuresHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المميزات:</h3><ul class="spec-list" style="border:none;">'+featuresHTML+'</ul>' : '')+(specsHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المواصفات:</h3><ul class="spec-list">'+specsHTML+'</ul>' : '')+(sizesHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المقاسات:</h3><ul class="spec-list">'+sizesHTML+'</ul>' : '')+'<div class="product-btns" style="margin-top:20px;"><button class="add-btn" onclick="addToCart(\''+p.id+'\', event);closeModal()">🛒 أضف للسلة</button><button class="order-btn" onclick="addToCart(\''+p.id+'\', event);closeModal();showOrderForm()">⚡ اطلب الآن</button></div></div>';
   document.getElementById('productModal').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -629,25 +674,9 @@ function closeModal(){ document.getElementById('productModal').classList.remove(
 function toggleFaq(el){ el.classList.toggle('open'); }
 function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), 2200); }
 
-async function init(){
-  products = await getProducts();
-  document.getElementById('featuredProducts').innerHTML = products.slice(0,6).map(productCardHTML).join('');
-  document.getElementById('allProducts').innerHTML = products.map(productCardHTML).join('');
-  if(products.length === 0){
-    document.getElementById('featuredProducts').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;font-size:15px;">لا توجد منتجات بعد. أدخل إلى <a href="admin.html" style="color:var(--pink);text-decoration:underline;">لوحة التحكم</a> لإضافة منتجات.</div>';
-    document.getElementById('allProducts').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;font-size:15px;">لا توجد منتجات بعد.</div>';
-  }
-  updateCartCount();
-  setInterval(async ()=>{
-    const fresh = await getProducts();
-    if(fresh.length !== products.length){
-      products = fresh;
-      document.getElementById('featuredProducts').innerHTML = products.slice(0,6).map(productCardHTML).join('');
-      document.getElementById('allProducts').innerHTML = products.map(productCardHTML).join('');
-    }
-  }, 3000);
-}
-init();
+// Init
+updateCartCount();
+loadProducts();
 </script>
 </body>
 </html>
