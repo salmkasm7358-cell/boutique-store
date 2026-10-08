@@ -220,7 +220,7 @@
   </div>
   <div class="form-card">
     <div class="form-card-title"><span class="ti-icon">🖼️</span> الصورة الرئيسية</div>
-    <div class="form-card-sub">ارفع صورة المنتج الرئيسية</div>
+    <div class="form-card-sub">ارفع صورة المنتج الرئيسية (سيتم ضغطها تلقائياً)</div>
     <div class="upload-box" id="mainUploadBox" onclick="document.getElementById('pImage').click()">
       <div class="up-ico">⬆️</div>
       <div class="up-text">اضغط هنا لاختيار الصورة الرئيسية</div>
@@ -230,7 +230,7 @@
   </div>
   <div class="form-card">
     <div class="form-card-title"><span class="ti-icon">🗂️</span> معرض الصور الإضافية</div>
-    <div class="form-card-sub">أضف صوراً إضافية للمنتج</div>
+    <div class="form-card-sub">أضف صوراً إضافية للمنتج (سيتم ضغطها تلقائياً)</div>
     <div class="upload-box" id="galleryUploadBox" onclick="document.getElementById('pGallery').click()">
       <div class="up-ico">🖼️</div>
       <div class="up-text">اضغط هنا لتحميل عدة صور معاً</div>
@@ -345,21 +345,47 @@ function showAdminPage(name){
   if(name === 'settings') loadSettings();
 }
 
-/* ========== Images (Base64) ========== */
+/* ========== Images (Base64 + Canvas Compression) ========== */
 let mainImageData = '';
+
 function handleMainImage(event){
   const file = event.target.files[0];
   if(!file) return;
   if(file.size > 5 * 1024 * 1024){ alert('⚠️ حجم الصورة كبير جداً. الحد الأقصى 5 ميجابايت'); return; }
+  
   const reader = new FileReader();
   reader.onload = (e) => {
-    mainImageData = e.target.result;
-    const box = document.getElementById('mainUploadBox');
-    box.classList.add('has-image');
-    box.innerHTML = '<img src="'+mainImageData+'" class="upload-preview"><button class="upload-remove" onclick="event.stopPropagation();removeMainImage()">✕</button>';
+    const img = new Image();
+    img.onload = () => {
+      // ضغط الصورة
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 800; // تم رفع الحجم إلى 800 لأعلى جودة
+      let width = img.width;
+      let height = img.height;
+      
+      if(width > height){
+        if(width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
+      } else {
+        if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // ضغط بجودة 70% (يجعل الحجم أصغر بـ 10 مرات تقريباً)
+      mainImageData = canvas.toDataURL('image/jpeg', 0.7);
+      
+      const box = document.getElementById('mainUploadBox');
+      box.classList.add('has-image');
+      box.innerHTML = '<img src="'+mainImageData+'" class="upload-preview"><button class="upload-remove" onclick="event.stopPropagation();removeMainImage()">✕</button>';
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
+
 function removeMainImage(){
   mainImageData = '';
   document.getElementById('pImage').value = '';
@@ -367,17 +393,43 @@ function removeMainImage(){
   box.classList.remove('has-image');
   box.innerHTML = '<div class="up-ico">⬆️</div><div class="up-text">اضغط هنا لاختيار الصورة الرئيسية</div><div class="up-hint">(JPG، PNG، WEBP - حد أقصى 5 ميجابايت)</div>';
 }
+
 let galleryImages = [];
+
 function handleGalleryImages(event){
   const files = Array.from(event.target.files);
   files.forEach(file => {
     if(file.size > 5 * 1024 * 1024) return;
     const reader = new FileReader();
-    reader.onload = (e) => { galleryImages.push(e.target.result); renderGallery(); };
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 800; // تم رفع الحجم إلى 800 لأعلى جودة
+        let width = img.width;
+        let height = img.height;
+        
+        if(width > height){
+          if(width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
+        } else {
+          if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        
+        // إضافة الصورة المضغوطة للمعرض بجودة 70%
+        galleryImages.push(canvas.toDataURL('image/jpeg', 0.7));
+        renderGallery();
+      };
+      img.src = e.target.result;
+    };
     reader.readAsDataURL(file);
   });
   event.target.value = '';
 }
+
 function renderGallery(){
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML = galleryImages.map((img, i) => '<div class="gallery-thumb"><img src="'+img+'"><button class="g-remove" onclick="removeGalleryImage('+i+')">✕</button></div>').join('');
@@ -576,4 +628,4 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-</html>
+      </html>
