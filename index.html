@@ -539,9 +539,22 @@ async function loadProducts(){
       products.push({ id: doc.id, ...doc.data() });
     });
     renderAllProducts();
+    return true;
   } catch(err) {
     console.error('Error loading products:', err);
-    document.getElementById('featuredProducts').innerHTML = '<div class="loading" style="color:#ff4d4d;">❌ خطأ في تحميل المنتجات</div>';
+    // إذا فشل الترتيب، جرب بدون ترتيب
+    try {
+      const snapshot = await db.collection('products').get();
+      products = [];
+      snapshot.forEach(doc => {
+        products.push({ id: doc.id, ...doc.data() });
+      });
+      renderAllProducts();
+      return true;
+    } catch(err2) {
+      console.error('Error loading products (no order):', err2);
+      return false;
+    }
   }
 }
 
@@ -771,4 +784,48 @@ function openModal(id){
   const specsHTML = p.specs ? Object.entries(p.specs).map(([k,v])=>'<li><span>'+k+'</span><span>'+v+'</span></li>').join('') : '';
   const sizesHTML = p.sizes && p.sizes.length ? p.sizes.map(s=>'<li><span>'+(s.size||'-')+'</span><span>'+(s.weight||'-')+'</span></li>').join('') : '';
   const imageHTML = p.image ? '<img src="'+p.image+'" alt="">' : p.emoji;
-  document.getElementById('modalContent').innerHTML = '<div class="img-side">'+imageHTML+'</div><div><h2>'+p.name+'</h2><div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' SAR</div><p>'+(p.desc||'')+'</p>'+(featuresHTML ? '<h3 style="color:var(
+  document.getElementById('modalContent').innerHTML = '<div class="img-side">'+imageHTML+'</div><div><h2>'+p.name+'</h2><div class="rating">'+'★'.repeat(Math.round(p.rating||4.5))+'☆'.repeat(5-Math.round(p.rating||4.5))+' '+(p.rating||4.5)+'</div><div class="price">'+p.price+' SAR</div><p>'+(p.desc||'')+'</p>'+(featuresHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المميزات:</h3><ul class="spec-list" style="border:none;">'+featuresHTML+'</ul>' : '')+(specsHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المواصفات:</h3><ul class="spec-list">'+specsHTML+'</ul>' : '')+(sizesHTML ? '<h3 style="color:var(--pink);margin-bottom:8px;">المقاسات:</h3><ul class="spec-list">'+sizesHTML+'</ul>' : '')+'<div class="product-btns" style="margin-top:20px;"><button class="add-btn" onclick="addToCart(\''+p.id+'\', event);closeModal()">🛒 أضف للسلة</button><button class="order-btn" onclick="addToCart(\''+p.id+'\', event);closeModal();showOrderForm()">⚡ اطلب الآن</button></div></div>';
+  document.getElementById('productModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){ document.getElementById('productModal').classList.remove('active'); document.body.style.overflow = ''; }
+
+function toggleFaq(el){
+  el.classList.toggle('open');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ========== Initialize ========== */
+document.addEventListener('DOMContentLoaded', function(){
+  console.log('🚀 بدء تشغيل المتجر...');
+  
+  // 1. تشغيل الوظائف الأساسية
+  loadSettings();
+  watchSettings();
+  updateCartCount();
+
+  // 2. محاولة جلب المنتجات بطريقة آمنة
+  loadProducts().then((success) => {
+    if (success) {
+      console.log('✅ تم تحميل المنتجات بنجاح');
+    } else {
+      console.error('❌ فشل تحميل المنتجات');
+      document.getElementById('featuredProducts').innerHTML = 
+        '<div style="grid-column:1/-1;text-align:center;color:#ff4d4d;padding:40px;">' +
+        '❌ تعذر تحميل المنتجات. تأكد من اتصالك بالإنترنت.<br>' +
+        '<button onclick="location.reload()" class="btn-pink" style="margin-top:15px;">إعادة المحاولة</button>' +
+        '</div>';
+    }
+  });
+});
+</script>
+</body>
+</html>
