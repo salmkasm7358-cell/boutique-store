@@ -101,6 +101,11 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #d4af37; color: #000; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast.error { background-color: #ff4d4d; color: #fff; }
+
+        /* أزرار تصفية الأقسام */
+        .cat-tab { cursor: pointer; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; border: 1px solid #2a2a2a; transition: 0.3s; }
+        .cat-tab.active { background: #a31853; color: white; border-color: #d4af37; }
+        .cat-tab:hover { border-color: #d4af37; }
     </style>
 </head>
 <body class="text-gray-200 h-screen flex overflow-hidden">
@@ -355,6 +360,10 @@
                 <!-- ======================== صفحة المنتجات ======================== -->
                 <div id="page-products" class="page-section">
                     <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-box-open text-brand-gold"></i> المنتجات</h2>
+                    
+                    <!-- أزرار تصفية الأقسام (تمت إضافتها هنا) -->
+                    <div id="productCategoryTabs" class="flex flex-wrap gap-2 mb-6"></div>
+
                     <div id="productsList" class="grid grid-cols-1 gap-4">
                         <div class="text-center text-brand-gold py-10">جاري تحميل المنتجات...</div>
                     </div>
@@ -428,7 +437,7 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 sessionStorage.setItem('adminLoggedIn', '1');
                 initCharts();
-                loadCategoriesForSelect(); // تحميل الأقسام في قائمة المنتجات
+                loadCategoriesForSelect();
             } else {
                 err.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
             }
@@ -511,7 +520,6 @@
         }
 
         /* ========== 5. إدارة الأقسام (CRUD) ========== */
-        
         function openCategoryForm(id = null) {
             document.getElementById('catId').value = id || '';
             document.getElementById('catName').value = '';
@@ -601,7 +609,6 @@
 
                 snapshot.forEach(doc => {
                     const cat = doc.data();
-                    // حساب عدد المنتجات التابعة للقسم
                     const prodCount = products.filter(p => p.category === cat.name).length;
                     
                     const imgHtml = cat.image ? `<img src="${cat.image}">` : '<i class="fa-solid fa-list text-gray-500"></i>';
@@ -638,7 +645,6 @@
 
         async function deleteCategory(id, name) {
             try {
-                // التحقق من وجود منتجات مرتبطة
                 const prodSnap = await db.collection("products").where("category", "==", name).get();
                 if(!prodSnap.empty) {
                     if(!confirm(`⚠️ تنبيه: يوجد عدد (${prodSnap.size}) من المنتجات المرتبطة بهذا القسم.\nإذا قمت بحذف القسم، ستبقى المنتجات ولكنها لن تظهر تحت أي قسم.\nهل أنت متأكد من الحذف؟`)) {
@@ -670,7 +676,10 @@
             }
         }
 
-        /* ========== 6. المنتجات ========== */
+        /* ========== 6. المنتجات (مع تصفية الأقسام) ========== */
+        let allProductsData = [];
+        let currentCategoryFilter = 'all';
+
         async function saveProduct() {
             const name = document.getElementById('pName').value.trim();
             const price = document.getElementById('pPrice').value;
@@ -712,32 +721,70 @@
 
         async function loadAdminProducts() {
             const list = document.getElementById('productsList');
+            const tabsContainer = document.getElementById('productCategoryTabs');
             list.innerHTML = '<div class="text-center text-brand-gold py-10">جاري التحميل...</div>';
+            
             try {
-                const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
-                if(snapshot.empty) {
-                    list.innerHTML = '<div class="text-center text-gray-500 py-10">لا توجد منتجات مضافة حتى الآن.</div>';
-                    return;
-                }
-                list.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const p = doc.data();
-                    const imgHtml = p.image ? `<img src="${p.image}">` : '📦';
-                    list.innerHTML += `
-                        <div class="admin-item">
-                            <div class="item-img">${imgHtml}</div>
-                            <div class="flex-1">
-                                <h4 class="text-white font-bold">${p.name}</h4>
-                                <p class="text-brand-gold font-bold">${p.price} ر.س</p>
-                                <p class="text-gray-500 text-xs">${p.category || 'بدون قسم'}</p>
-                            </div>
-                            <button onclick="deleteProduct('${doc.id}')" class="bg-red-600/20 text-red-500 w-10 h-10 rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `;
+                // 1. جلب الأقسام لتوليد الأزرار
+                const catSnap = await db.collection("categories").orderBy("order", "asc").get();
+                tabsContainer.innerHTML = `<button onclick="filterProducts('all', this)" class="cat-tab active">كل المنتجات</button>`;
+                
+                catSnap.forEach(doc => {
+                    const cat = doc.data();
+                    tabsContainer.innerHTML += `<button onclick="filterProducts('${cat.name}', this)" class="cat-tab">${cat.name}</button>`;
                 });
+
+                // 2. جلب المنتجات
+                const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
+                allProductsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // 3. عرض المنتجات
+                renderProductsHTML(currentCategoryFilter);
+
             } catch (error) {
-                list.innerHTML = `<div class="text-center text-red-500 py-10">خطأ في التحميل</div>`;
+                console.error(error);
+                list.innerHTML = `<div class="text-center text-red-500 py-10">خطأ في التحميل: ${error.message}</div>`;
             }
+        }
+
+        function filterProducts(categoryName, btnElement) {
+            currentCategoryFilter = categoryName;
+            
+            // تحديث شكل الأزرار
+            document.querySelectorAll('.cat-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            btnElement.classList.add('active');
+
+            renderProductsHTML(categoryName);
+        }
+
+        function renderProductsHTML(categoryFilter) {
+            const list = document.getElementById('productsList');
+            const filtered = categoryFilter === 'all' 
+                ? allProductsData 
+                : allProductsData.filter(p => p.category === categoryFilter);
+
+            if(filtered.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-10">لا توجد منتجات في هذا القسم.</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            filtered.forEach(p => {
+                const imgHtml = p.image ? `<img src="${p.image}">` : '📦';
+                list.innerHTML += `
+                    <div class="admin-item">
+                        <div class="item-img">${imgHtml}</div>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold">${p.name}</h4>
+                            <p class="text-brand-gold font-bold">${p.price} ر.س</p>
+                            <span class="text-xs bg-brand-pink/20 text-brand-pinkLight px-2 py-0.5 rounded border border-brand-pink/30 mt-1 inline-block">${p.category || 'بدون قسم'}</span>
+                        </div>
+                        <button onclick="deleteProduct('${p.id}')" class="bg-red-600/20 text-red-500 w-10 h-10 rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
         }
 
         async function deleteProduct(id) {
@@ -828,4 +875,4 @@
         };
     </script>
 </body>
-                            </html>
+</html>
