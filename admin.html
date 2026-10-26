@@ -1,631 +1,549 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة تحكم بوتيك السعادة</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<style>
-  :root{--pink:#ff1493;--pink-light:#ff69b4;--pink-dark:#c71585;--dark:#0a0a0a;--dark-2:#151515;--dark-3:#1e1e1e;}
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif;}
-  body{background:var(--dark);color:#eee;min-height:100vh;padding:20px;}
-  .login-screen{width:100%;max-width:400px;text-align:center;margin:80px auto;}
-  .login-screen h1{color:var(--pink);font-size:24px;margin-bottom:30px;font-weight:900;text-shadow:0 0 15px rgba(255,20,147,.5);}
-  .login-screen input{width:100%;padding:14px 18px;margin-bottom:14px;border-radius:12px;background:#1a0a15;border:1px solid #333;color:#fff;font-size:16px;transition:.3s;}
-  .login-screen input:focus{outline:none;border-color:var(--pink);background:#222;box-shadow:0 0 15px rgba(255,20,147,.3);}
-  .login-screen button{width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--pink-light),var(--pink),var(--pink-dark));color:#fff;font-weight:700;font-size:16px;border:none;cursor:pointer;transition:.3s;margin-top:10px;}
-  .login-screen button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,20,147,.5);}
-  .login-error{color:#ff4d4d;font-size:14px;margin-top:10px;min-height:20px;}
-  .dashboard{display:none;width:100%;max-width:900px;margin:0 auto;text-align:center;}
-  .dashboard.active{display:block;animation:fadeIn .5s;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-  .dash-title{font-size:clamp(22px,4vw,36px);font-weight:900;color:var(--pink);margin-bottom:40px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-shadow:0 0 15px rgba(255,20,147,.4);}
-  .dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:700px;margin:0 auto 30px;}
-  .dash-btn{background:linear-gradient(145deg,#2a0a1e,#1a0a15);border:1px solid rgba(255,20,147,.3);border-radius:16px;padding:28px 20px;color:#fff;font-size:17px;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 4px 15px rgba(0,0,0,.5);}
-  .dash-btn:hover{border-color:var(--pink);background:linear-gradient(145deg,#3a0a2a,#2a0a1e);transform:translateY(-3px);box-shadow:0 8px 25px rgba(255,20,147,.3);}
-  .dash-btn .ico{font-size:22px;}
-  .logout-btn{background:transparent;border:none;color:#ff3d3d;font-size:17px;font-weight:700;cursor:pointer;padding:14px 24px;transition:.3s;display:inline-flex;align-items:center;gap:10px;}
-  .logout-btn:hover{color:#ff6b6b;transform:scale(1.05);}
-  .admin-page{display:none;width:100%;max-width:900px;margin:0 auto;text-align:right;}
-  .admin-page.active{display:block;animation:fadeIn .4s;}
-  .page-top-title{color:var(--pink);font-size:22px;margin-bottom:22px;text-align:center;font-weight:900;}
-  .page-top-title .sub{color:#888;font-size:12px;display:block;margin-top:4px;font-weight:400;}
-  .back-admin{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--pink);color:var(--pink);padding:10px 20px;border-radius:50px;font-size:14px;cursor:pointer;transition:.3s;margin-bottom:24px;}
-  .back-admin:hover{background:var(--pink);color:#fff;box-shadow:0 5px 20px rgba(255,20,147,.4);}
-  .form-card{background:linear-gradient(145deg,#1a0a15,#0f0f0f);border:1px solid #2a0a1a;border-radius:16px;padding:22px;margin-bottom:18px;}
-  .form-card-title{display:flex;align-items:center;gap:10px;color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;}
-  .form-card-title .ti-icon{font-size:20px;color:var(--pink);}
-  .form-card-sub{color:#777;font-size:12px;margin-bottom:18px;padding-right:30px;}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .form-group{margin-bottom:14px;}
-  .form-group label{display:block;color:var(--pink-light);font-weight:600;margin-bottom:6px;font-size:13px;}
-  .form-group label .req{color:#ff4d4d;}
-  .form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 14px;border-radius:10px;background:#0d0d0d;border:1px solid #2a2a2a;color:#fff;font-size:14px;font-family:inherit;transition:.3s;}
-  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--pink);background:#1a0a15;box-shadow:0 0 12px rgba(255,20,147,.3);}
-  .form-group textarea{min-height:80px;resize:vertical;}
-  .form-hint{color:#666;font-size:11.5px;margin-top:5px;}
-  .upload-box{background:#0d0d0d;border:2px dashed #2a2a2a;border-radius:12px;padding:26px 20px;text-align:center;cursor:pointer;transition:.3s;position:relative;}
-  .upload-box:hover{border-color:var(--pink);background:#1a0a15;}
-  .upload-box .up-ico{font-size:32px;margin-bottom:10px;color:var(--pink);}
-  .upload-box .up-text{color:#ccc;font-size:14px;margin-bottom:5px;font-weight:600;}
-  .upload-box .up-hint{color:#666;font-size:11px;}
-  .upload-box.has-image{padding:0;border-style:solid;border-color:var(--pink);}
-  .upload-preview{width:100%;max-height:260px;object-fit:cover;border-radius:10px;display:block;}
-  .upload-remove{position:absolute;top:10px;left:10px;background:#b3261e;color:#fff;border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:14px;z-index:2;}
-  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:12px;}
-  .gallery-thumb{position:relative;border-radius:10px;overflow:hidden;border:1px solid #2a2a2a;aspect-ratio:1;background:#0d0d0d;}
-  .gallery-thumb img{width:100%;height:100%;object-fit:cover;}
-  .gallery-thumb .g-remove{position:absolute;top:4px;left:4px;background:rgba(179,38,30,.9);color:#fff;border:none;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:12px;}
-  .color-list{display:flex;gap:10px;flex-wrap:wrap;padding:5px 0;}
-  .color-dot{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.3s;position:relative;}
-  .color-dot:hover{transform:scale(1.1);}
-  .color-dot.selected{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,20,147,.3);}
-  .sizes-list{display:grid;gap:10px;}
-  .size-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;}
-  .size-row input{padding:10px 12px;}
-  .size-remove{background:#b3261e;color:#fff;border:none;width:38px;height:38px;border-radius:8px;cursor:pointer;font-size:14px;transition:.3s;}
-  .add-size-btn{background:transparent;border:1.5px dashed var(--pink);color:var(--pink);padding:10px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px;transition:.3s;margin-top:10px;width:100%;}
-  .add-size-btn:hover{background:rgba(255,20,147,.1);}
-  .stars{display:flex;gap:6px;font-size:32px;cursor:pointer;justify-content:flex-end;}
-  .stars .star{color:#333;transition:.2s;}
-  .stars .star.active{color:var(--pink);text-shadow:0 0 10px rgba(255,20,147,.6);}
-  .stars .star:hover{transform:scale(1.15);}
-  .rating-text{color:#aaa;font-size:13px;text-align:left;margin-top:5px;}
-  .form-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px;}
-  .btn-cancel{background:transparent;border:1px solid #555;color:#ccc;padding:14px 30px;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px;transition:.3s;}
-  .btn-cancel:hover{background:#222;color:#fff;}
-  .btn-save{background:linear-gradient(135deg,var(--pink-light),var(--pink),var(--pink-dark));color:#fff;padding:14px 40px;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px;border:none;transition:.3s;box-shadow:0 6px 20px rgba(255,20,147,.4);}
-  .btn-save:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,20,147,.6);}
-  .admin-list{display:grid;gap:12px;}
-  .admin-item{background:#111;border:1px solid #222;border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px;transition:.3s;}
-  .admin-item:hover{border-color:var(--pink);box-shadow:0 5px 20px rgba(255,20,147,.2);}
-  .admin-item .item-img{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#222;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden;}
-  .admin-item .item-img img{width:100%;height:100%;object-fit:cover;}
-  .admin-item .item-info{flex:1;}
-  .admin-item .item-info h4{color:#fff;font-size:14.5px;margin-bottom:4px;}
-  .admin-item .item-info p{color:#999;font-size:12.5px;}
-  .admin-item .item-actions button{background:#b3261e;color:#fff;border:none;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:14px;transition:.3s;}
-  .admin-item .item-actions button:hover{transform:scale(1.08);}
-  .order-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px;}
-  .order-card h4{color:var(--pink);margin-bottom:8px;font-size:15px;}
-  .order-card p{color:#ccc;font-size:13.5px;line-height:1.8;}
-  .order-card .order-items{background:#0a0a0a;border-radius:8px;padding:10px;margin:10px 0;}
-  .order-card .order-items li{color:#bbb;font-size:13px;padding:3px 0;list-style:none;}
-  .empty-msg{text-align:center;color:#666;padding:40px 20px;font-size:15px;}
-  .loading-msg{text-align:center;color:var(--pink);padding:30px;font-size:14px;}
-  @media(max-width:600px){
-    .dash-grid{grid-template-columns:1fr;}
-    .dash-btn{padding:22px 18px;font-size:16px;}
-    .form-row{grid-template-columns:1fr;}
-  }
-</style>
-</head>
-<body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم | بوتيك السعادة</title>
+    
+    <!-- خط Cairo من جوجل -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- مكتبة الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- مكتبة Tailwind CSS للتصميم -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- مكتبة Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="login-screen" id="loginScreen">
-  <h1>🔐 دخول لوحة تحكم بوتيك السعادة</h1>
-  <input type="text" id="loginUser" placeholder="اسم المستخدم">
-  <input type="password" id="loginPass" placeholder="كلمة المرور">
-  <button onclick="doLogin()">تسجيل الدخول</button>
-  <div class="login-error" id="loginError"></div>
-  <p style="color:#555;font-size:12px;margin-top:20px;">افتراضي: admin / admin123</p>
-</div>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#050505',
+                            dark: '#0f0f0f',
+                            card: '#141414',
+                            gold: '#d4af37',
+                            goldLight: '#f3e5ab',
+                            pink: '#a31853',
+                            pinkLight: '#d81b60',
+                            border: '#2a2a2a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
-<div class="dashboard" id="dashboard">
-  <div class="dash-title">🔥 لوحة تحكم بوتيك السعادة</div>
-  <div class="dash-grid">
-    <button class="dash-btn" onclick="showAdminPage('addProduct')"><span class="ico">📦</span> + إضافة منتج</button>
-    <button class="dash-btn" onclick="showAdminPage('products')"><span class="ico">🛍️</span> المنتجات</button>
-    <button class="dash-btn" onclick="showAdminPage('orders')"><span class="ico">📋</span> الطلبات</button>
-    <button class="dash-btn" onclick="showAdminPage('categories')"><span class="ico">🗂️</span> التصنيفات</button>
-    <button class="dash-btn" onclick="openStore()"><span class="ico">👁️</span> المتجر</button>
-    <button class="dash-btn" onclick="showAdminPage('settings')"><span class="ico">⚙️</span> الإعدادات</button>
-  </div>
-  <button class="logout-btn" onclick="doLogout()"><span>🚪</span> تسجيل خروج</button>
-</div>
+    <style>
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at 100% 0%, rgba(163, 24, 83, 0.1) 0%, transparent 40%),
+                              radial-gradient(circle at 0% 100%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
 
-<div class="admin-page" id="admin-addProduct">
-  <button class="back-admin" onclick="backToDash()">← رجوع</button>
-  <div class="page-top-title">
-    + إضافة منتج جديد
-    <span class="sub">الرئيسية / المنتجات / منتج جديد</span>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">📝</span> المعلومات الأساسية</div>
-    <div class="form-card-sub">البيانات الأساسية للمنتج: الاسم والسعر والتصنيف</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>اسم المنتج <span class="req">*</span></label>
-        <input type="text" id="pName" placeholder="مثال: هزاز الأرنب">
-      </div>
-      <div class="form-group">
-        <label>السعر (SAR) <span class="req">*</span></label>
-        <input type="number" id="pPrice" placeholder="199">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>التصنيف</label>
-        <select id="pCat">
-          <option value="رجالية">الألعاب الرجالية</option>
-          <option value="نسائية">ألعاب نسائية</option>
-          <option value="كريمات">كريمات وزيوت</option>
-          <option value="ملابس">ملابس داخلية</option>
-          <option value="إكسسوارات">إكسسوارات</option>
-          <option value="زوجية">ألعاب زوجية</option>
-          <option value="عناية">عناية شخصية</option>
-          <option value="جديدة">منتجات جديدة</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>الشارة (اختياري)</label>
-        <input type="text" id="pBadge" placeholder="مثال: الأكثر مبيعاً">
-      </div>
-    </div>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">📄</span> وصف المنتج</div>
-    <div class="form-card-sub">اجذب عملاءك بوصف دقيق ومفصل</div>
-    <div class="form-group">
-      <label>نبذة مختصرة</label>
-      <input type="text" id="pShortDesc" placeholder="جملة تسويقية قصيرة">
-    </div>
-    <div class="form-group">
-      <label>الوصف التفصيلي</label>
-      <textarea id="pDesc" placeholder="اكتب هنا تفاصيل المنتج ومميزاته..."></textarea>
-    </div>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">🎨</span> الألوان المتاحة</div>
-    <div class="form-card-sub">حدد خيارات الألوان المتوفرة</div>
-    <div class="form-group">
-      <label>اختر من لوحة الألوان السريعة</label>
-      <div class="color-list" id="colorList">
-        <div class="color-dot" data-color="#000000" style="background:#000;border-color:#444" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#FFFFFF" style="background:#fff" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#F44336" style="background:#F44336" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#2196F3" style="background:#2196F3" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#E91E63" style="background:#E91E63" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#9C27B0" style="background:#9C27B0" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#4CAF50" style="background:#4CAF50" onclick="selectColor(this)"></div>
-        <div class="color-dot" data-color="#FFC107" style="background:#FFC107" onclick="selectColor(this)"></div>
-      </div>
-      <input type="text" id="pColor" placeholder="مثال: أسود، أحمر" style="margin-top:10px;">
-    </div>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">📏</span> المقاسات والأوزان</div>
-    <div class="form-card-sub">أضف المقاسات المتوفرة (اختياري)</div>
-    <div class="sizes-list" id="sizesList">
-      <div class="size-row">
-        <input type="text" class="size-input" placeholder="المقاس">
-        <input type="text" class="weight-input" placeholder="الوزن">
-        <button class="size-remove" onclick="this.parentElement.remove()">✕</button>
-      </div>
-    </div>
-    <button class="add-size-btn" onclick="addSizeRow()">+ إضافة مقاس آخر</button>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">⭐</span> التقييم الابتدائي</div>
-    <div class="stars" id="ratingStars">
-      <span class="star" data-value="1" onclick="setRating(1)">★</span>
-      <span class="star" data-value="2" onclick="setRating(2)">★</span>
-      <span class="star" data-value="3" onclick="setRating(3)">★</span>
-      <span class="star" data-value="4" onclick="setRating(4)">★</span>
-      <span class="star" data-value="5" onclick="setRating(5)">★</span>
-    </div>
-    <div class="rating-text">التقييم: <span id="ratingText">0</span> / 5</div>
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">🖼️</span> الصورة الرئيسية</div>
-    <div class="form-card-sub">ارفع صورة المنتج الرئيسية (سيتم ضغطها تلقائياً)</div>
-    <div class="upload-box" id="mainUploadBox" onclick="document.getElementById('pImage').click()">
-      <div class="up-ico">⬆️</div>
-      <div class="up-text">اضغط هنا لاختيار الصورة الرئيسية</div>
-      <div class="up-hint">(JPG، PNG، WEBP - حد أقصى 5 ميجابايت)</div>
-    </div>
-    <input type="file" id="pImage" accept="image/*" style="display:none" onchange="handleMainImage(event)">
-  </div>
-  <div class="form-card">
-    <div class="form-card-title"><span class="ti-icon">🗂️</span> معرض الصور الإضافية</div>
-    <div class="form-card-sub">أضف صوراً إضافية للمنتج (سيتم ضغطها تلقائياً)</div>
-    <div class="upload-box" id="galleryUploadBox" onclick="document.getElementById('pGallery').click()">
-      <div class="up-ico">🖼️</div>
-      <div class="up-text">اضغط هنا لتحميل عدة صور معاً</div>
-      <div class="up-hint">يمكنك تحديد أكثر من صورة</div>
-    </div>
-    <input type="file" id="pGallery" accept="image/*" multiple style="display:none" onchange="handleGalleryImages(event)">
-    <div class="gallery-grid" id="galleryGrid"></div>
-  </div>
-  <div class="form-actions">
-    <button class="btn-cancel" onclick="backToDash()">إلغاء الحفظ</button>
-    <button class="btn-save" onclick="saveProduct()">💾 نشر المنتج</button>
-  </div>
-</div>
+        /* تأثير حركي فخم لاسم المتجر */
+        .animated-logo {
+            background: linear-gradient(to right, #d4af37, #fff, #a31853, #d4af37);
+            background-size: 300% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 4s linear infinite;
+        }
 
-<div class="admin-page" id="admin-products">
-  <button class="back-admin" onclick="backToDash()">← رجوع</button>
-  <h2 style="color:var(--pink);text-align:center;margin-bottom:20px;">🛍️ المنتجات</h2>
-  <div class="admin-list" id="productsList"></div>
-</div>
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
 
-<div class="admin-page" id="admin-orders">
-  <button class="back-admin" onclick="backToDash()">← رجوع</button>
-  <h2 style="color:var(--pink);text-align:center;margin-bottom:20px;">📋 الطلبات</h2>
-  <div id="ordersList"></div>
-</div>
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #a31853; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
 
-<div class="admin-page" id="admin-categories">
-  <button class="back-admin" onclick="backToDash()">← رجوع</button>
-  <h2 style="color:var(--pink);text-align:center;margin-bottom:20px;">🗂️ التصنيفات</h2>
-  <div class="admin-list">
-    <div class="admin-item"><span class="item-img">⛓️</span><div class="item-info"><h4>الألعاب الرجالية</h4><p>تصنيف المنتجات الخاصة بالرجال</p></div></div>
-    <div class="admin-item"><span class="item-img">💖</span><div class="item-info"><h4>ألعاب نسائية</h4><p>تصنيف المنتجات الخاصة بالنساء</p></div></div>
-    <div class="admin-item"><span class="item-img">🧴</span><div class="item-info"><h4>كريمات وزيوت</h4><p>منتجات العناية والمزلقات</p></div></div>
-    <div class="admin-item"><span class="item-img">👙</span><div class="item-info"><h4>ملابس داخلية</h4><p>مجموعة الملابس الداخلية</p></div></div>
-    <div class="admin-item"><span class="item-img">🔗</span><div class="item-info"><h4>إكسسوارات</h4><p>إكسسوارات وأدوات مساعدة</p></div></div>
-    <div class="admin-item"><span class="item-img">💑</span><div class="item-info"><h4>ألعاب زوجية</h4><p>ألعاب للاستخدام المشترك</p></div></div>
-    <div class="admin-item"><span class="item-img">💧</span><div class="item-info"><h4>عناية شخصية</h4><p>منتجات العناية والنظافة</p></div></div>
-    <div class="admin-item"><span class="item-img">🔥</span><div class="item-info"><h4>منتجات جديدة</h4><p>أحدث الإضافات</p></div></div>
-  </div>
-</div>
-
-<div class="admin-page" id="admin-settings">
-  <button class="back-admin" onclick="backToDash()">← رجوع</button>
-  <h2 style="color:var(--pink);text-align:center;margin-bottom:20px;">⚙️ الإعدادات</h2>
-  <div class="form-card">
-    <div class="form-group">
-      <label>اسم المتجر</label>
-      <input type="text" value="بوتيك السعادة" id="setStoreName">
-    </div>
-    <div class="form-group">
-      <label>رقم الواتساب</label>
-      <input type="text" value="+966580700000" id="setWhatsapp" dir="ltr" placeholder="+966XXXXXXXXX">
-      <div class="form-hint">⚠️ ابدأ بـ +966 ثم الرقم كاملاً بدون مسافات</div>
-    </div>
-    <div class="form-group">
-      <label>البريد الإلكتروني</label>
-      <input type="email" value="mtjrars805@gmail.com" id="setEmail" dir="ltr">
-    </div>
-    <button class="btn-save" style="width:100%" onclick="saveSettings()">💾 حفظ الإعدادات</button>
-    <div class="form-hint" style="text-align:center;margin-top:14px;color:var(--pink);">✨ التغييرات ستظهر في المتجر فوراً</div>
-  </div>
-</div>
-
-<script>
-/* ========== Firebase Config ========== */
-const firebaseConfig = {
-  apiKey: "AIzaSyBPW_K2Kw-VARAQHPsSLT53Y0wPzxC6ATM",
-  authDomain: "boutique-saada.firebaseapp.com",
-  projectId: "boutique-saada",
-  storageBucket: "boutique-saada.firebasestorage.app",
-  messagingSenderId: "812086015531",
-  appId: "1:812086015531:web:70c6a4e0e0402659161c6e"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-/* ========== Login ========== */
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin123';
-
-function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value.trim();
-  const err = document.getElementById('loginError');
-  if(u === ADMIN_USER && p === ADMIN_PASS){
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboard').classList.add('active');
-    sessionStorage.setItem('adminLoggedIn', '1');
-    loadSettings();
-  } else {
-    err.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
-  }
-}
-function doLogout(){
-  if(confirm('هل تريد تسجيل الخروج؟')){
-    sessionStorage.removeItem('adminLoggedIn');
-    location.reload();
-  }
-}
-function openStore(){ window.open('index.html', '_blank'); }
-function backToDash(){
-  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('dashboard').classList.add('active');
-  resetForm();
-}
-function showAdminPage(name){
-  document.getElementById('dashboard').classList.remove('active');
-  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('admin-' + name).classList.add('active');
-  if(name === 'products') loadAdminProducts();
-  if(name === 'orders') loadAdminOrders();
-  if(name === 'settings') loadSettings();
-}
-
-/* ========== Images (Base64 + Canvas Compression) ========== */
-let mainImageData = '';
-
-function handleMainImage(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  if(file.size > 5 * 1024 * 1024){ alert('⚠️ حجم الصورة كبير جداً. الحد الأقصى 5 ميجابايت'); return; }
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      // ضغط الصورة
-      const canvas = document.createElement('canvas');
-      const MAX_SIZE = 800; // تم رفع الحجم إلى 800 لأعلى جودة
-      let width = img.width;
-      let height = img.height;
-      
-      if(width > height){
-        if(width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
-      } else {
-        if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
-      }
-      
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      
-      // ضغط بجودة 70% (يجعل الحجم أصغر بـ 10 مرات تقريباً)
-      mainImageData = canvas.toDataURL('image/jpeg', 0.7);
-      
-      const box = document.getElementById('mainUploadBox');
-      box.classList.add('has-image');
-      box.innerHTML = '<img src="'+mainImageData+'" class="upload-preview"><button class="upload-remove" onclick="event.stopPropagation();removeMainImage()">✕</button>';
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeMainImage(){
-  mainImageData = '';
-  document.getElementById('pImage').value = '';
-  const box = document.getElementById('mainUploadBox');
-  box.classList.remove('has-image');
-  box.innerHTML = '<div class="up-ico">⬆️</div><div class="up-text">اضغط هنا لاختيار الصورة الرئيسية</div><div class="up-hint">(JPG، PNG، WEBP - حد أقصى 5 ميجابايت)</div>';
-}
-
-let galleryImages = [];
-
-function handleGalleryImages(event){
-  const files = Array.from(event.target.files);
-  files.forEach(file => {
-    if(file.size > 5 * 1024 * 1024) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_SIZE = 800; // تم رفع الحجم إلى 800 لأعلى جودة
-        let width = img.width;
-        let height = img.height;
-        
-        if(width > height){
-          if(width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
-        } else {
-          if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
+        /* تأثيرات إضافية */
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(42, 42, 42, 1);
         }
         
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        .glow-border:hover {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body class="text-gray-200 h-screen flex overflow-hidden">
+
+    <!-- 1. القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-brand-dark border-l border-brand-border flex flex-col justify-between flex-shrink-0 z-20">
+        <div>
+            <!-- الشعار المتحرك -->
+            <div class="h-20 flex items-center justify-center border-b border-brand-border px-4">
+                <h1 class="text-3xl font-black animated-logo tracking-wider">بوتيك السعادة</h1>
+            </div>
+            
+            <!-- روابط القائمة -->
+            <nav class="mt-4 space-y-1 px-3">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 bg-brand-pink text-white rounded-lg border-r-4 border-brand-gold shadow-lg shadow-brand-pink/20 transition-all">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span class="font-bold">الرئيسية</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-box-open w-5 text-center"></i>
+                    <span class="font-semibold">المنتجات</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-list w-5 text-center"></i>
+                    <span class="font-semibold">الأقسام</span>
+                </a>
+                <a href="#" class="flex items-center justify-between px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-cart-shopping w-5 text-center"></i>
+                        <span class="font-semibold">الطلبات</span>
+                    </div>
+                    <span class="bg-brand-pink text-white text-xs font-bold px-2 py-0.5 rounded-full">12</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-users w-5 text-center"></i>
+                    <span class="font-semibold">العملاء</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                    <span class="font-semibold">المخزون</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span class="font-semibold">التقارير</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-tags w-5 text-center"></i>
+                    <span class="font-semibold">العروض والخصومات</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-brand-gold hover:bg-white/5 rounded-lg transition-all">
+                    <i class="fa-solid fa-gear w-5 text-center"></i>
+                    <span class="font-semibold">الإعدادات</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- بانر سفلي -->
+        <div class="p-4 border-t border-brand-border bg-gradient-to-t from-brand-pink/10 to-transparent text-center">
+            <div class="w-16 h-16 mx-auto bg-brand-dark rounded-full border-2 border-brand-gold flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+                <span class="text-2xl font-black animated-logo">S</span>
+            </div>
+            <h2 class="text-lg font-bold text-brand-gold">بوتيك السعادة</h2>
+            <p class="text-[10px] text-gray-400 mt-1">متجر الألعاب الزوجية ومنتجات العناية بالخصوصية</p>
+            <p class="text-brand-pinkLight italic mt-2 text-xs font-semibold">More Pleasure Together</p>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        // إضافة الصورة المضغوطة للمعرض بجودة 70%
-        galleryImages.push(canvas.toDataURL('image/jpeg', 0.7));
-        renderGallery();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-  event.target.value = '';
-}
+        <!-- 2. الشريط العلوي (Header) -->
+        <header class="h-20 glass-panel flex justify-between items-center px-6 border-b border-brand-border z-10 sticky top-0">
+            <!-- البحث -->
+            <div class="relative w-96">
+                <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <input type="text" placeholder="ابحث عن منتج أو طلب أو عميل..." 
+                    class="w-full bg-brand-black border border-brand-border rounded-full py-2.5 pr-10 pl-4 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all text-gray-300">
+            </div>
 
-function renderGallery(){
-  const grid = document.getElementById('galleryGrid');
-  grid.innerHTML = galleryImages.map((img, i) => '<div class="gallery-thumb"><img src="'+img+'"><button class="g-remove" onclick="removeGalleryImage('+i+')">✕</button></div>').join('');
-}
-function removeGalleryImage(i){ galleryImages.splice(i, 1); renderGallery(); }
+            <!-- الملف الشخصي والإشعارات -->
+            <div class="flex items-center gap-5">
+                <button class="relative w-10 h-10 rounded-full bg-brand-card border border-brand-border hover:border-brand-gold hover:text-brand-gold transition-all flex items-center justify-center text-gray-400">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-0 right-0 bg-brand-pink text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-brand-dark">3</span>
+                </button>
+                <button class="w-10 h-10 rounded-full bg-brand-card border border-brand-border hover:border-brand-gold hover:text-brand-gold transition-all flex items-center justify-center text-gray-400">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </button>
+                
+                <div class="h-8 w-px bg-brand-border mx-2"></div>
+                
+                <div class="flex items-center gap-3 cursor-pointer group">
+                    <div class="text-left">
+                        <p class="text-sm font-bold text-gray-200 group-hover:text-brand-gold transition-colors">مدير المتجر</p>
+                        <p class="text-[11px] text-brand-pinkLight">بوتيك السعادة</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-pink to-purple-900 flex items-center justify-center border-2 border-brand-gold overflow-hidden">
+                        <i class="fa-solid fa-user text-white"></i>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+                </div>
+            </div>
+        </header>
 
-/* ========== Colors ========== */
-let selectedColor = '';
-function selectColor(el){
-  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedColor = el.dataset.color;
-  const map = {'#000000':'أسود','#FFFFFF':'أبيض','#E91E63':'وردي','#F44336':'أحمر','#2196F3':'أزرق','#9C27B0':'بنفسجي','#4CAF50':'أخضر','#FFC107':'ذهبي'};
-  document.getElementById('pColor').value = map[selectedColor] || '';
-}
+        <!-- 3. محتوى لوحة التحكم -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            
+            <!-- الترحيب -->
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-house text-brand-gold"></i> لوحة التحكم
+                    </h2>
+                    <p class="text-gray-400 text-sm mt-1">مرحباً بك في لوحة إدارة بوتيك السعادة</p>
+                </div>
+            </div>
 
-/* ========== Sizes ========== */
-function addSizeRow(){
-  const list = document.getElementById('sizesList');
-  const div = document.createElement('div');
-  div.className = 'size-row';
-  div.innerHTML = '<input type="text" class="size-input" placeholder="المقاس"><input type="text" class="weight-input" placeholder="الوزن"><button class="size-remove" onclick="this.parentElement.remove()">✕</button>';
-  list.appendChild(div);
-}
+            <!-- البطاقات الإحصائية (Stats) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- إجمالي المبيعات -->
+                <div class="bg-brand-card rounded-xl p-5 border border-brand-border glow-border transition-all relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-sm font-semibold">إجمالي المبيعات</p>
+                            <h4 class="text-2xl font-bold mt-2 text-white">24,680 <span class="text-sm font-normal text-gray-500">ر.س</span></h4>
+                            <p class="text-xs mt-3 text-green-500 flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-arrow-trend-up"></i> 25%
+                                <span class="text-gray-500 font-normal mr-1">مقارنة بالشهر الماضي</span>
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-yellow-500/10 text-brand-gold flex items-center justify-center text-xl border border-yellow-500/20">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                </div>
 
-/* ========== Rating ========== */
-let ratingValue = 0;
-function setRating(v){
-  ratingValue = v;
-  document.querySelectorAll('#ratingStars .star').forEach(s => {
-    s.classList.toggle('active', parseInt(s.dataset.value) <= v);
-  });
-  document.getElementById('ratingText').textContent = v;
-}
+                <!-- إجمالي الطلبات -->
+                <div class="bg-brand-card rounded-xl p-5 border border-brand-border glow-border transition-all relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-sm font-semibold">إجمالي الطلبات</p>
+                            <h4 class="text-2xl font-bold mt-2 text-white">856</h4>
+                            <p class="text-xs mt-3 text-green-500 flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-arrow-trend-up"></i> 18%
+                                <span class="text-gray-500 font-normal mr-1">مقارنة بالشهر الماضي</span>
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-brand-pink/10 text-brand-pinkLight flex items-center justify-center text-xl border border-brand-pink/20">
+                            <i class="fa-solid fa-box"></i>
+                        </div>
+                    </div>
+                </div>
 
-/* ========== Save Product ========== */
-async function saveProduct(){
-  const name = document.getElementById('pName').value.trim();
-  const price = parseFloat(document.getElementById('pPrice').value);
-  const cat = document.getElementById('pCat').value;
-  const badge = document.getElementById('pBadge').value.trim();
-  const shortDesc = document.getElementById('pShortDesc').value.trim();
-  const desc = document.getElementById('pDesc').value.trim();
-  const colorName = document.getElementById('pColor').value.trim();
-  const colorHex = selectedColor;
+                <!-- إجمالي العملاء -->
+                <div class="bg-brand-card rounded-xl p-5 border border-brand-border glow-border transition-all relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-sm font-semibold">إجمالي العملاء</p>
+                            <h4 class="text-2xl font-bold mt-2 text-white">1,248</h4>
+                            <p class="text-xs mt-3 text-green-500 flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-arrow-trend-up"></i> 12%
+                                <span class="text-gray-500 font-normal mr-1">مقارنة بالشهر الماضي</span>
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl border border-purple-500/20">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
 
-  if(!name || !price){ alert('⚠️ يرجى ملء اسم المنتج والسعر على الأقل'); return; }
+                <!-- المنتجات المتاحة -->
+                <div class="bg-brand-card rounded-xl p-5 border border-brand-border glow-border transition-all relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-sm font-semibold">المنتجات المتاحة</p>
+                            <h4 class="text-2xl font-bold mt-2 text-white">128</h4>
+                            <p class="text-xs mt-3 text-green-500 flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-arrow-trend-up"></i> 5%
+                                <span class="text-gray-500 font-normal mr-1">مقارنة بالشهر الماضي</span>
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-brand-pink/10 text-brand-pinkLight flex items-center justify-center text-xl border border-brand-pink/20">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  const sizes = [];
-  document.querySelectorAll('#sizesList .size-row').forEach(row => {
-    const s = row.querySelector('.size-input').value.trim();
-    const w = row.querySelector('.weight-input').value.trim();
-    if(s || w) sizes.push({size: s, weight: w});
-  });
+            <!-- المخططات البيانية (Charts) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- مخطط المبيعات -->
+                <div class="lg:col-span-2 bg-brand-card border border-brand-border rounded-xl p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-brand-gold"></i> المبيعات خلال أخر 7 أيام
+                        </h3>
+                    </div>
+                    <div class="h-64 w-full">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
 
-  try {
-    await db.collection('products').add({
-      name, price, cat, badge, desc,
-      shortDesc: shortDesc || '',
-      emoji: '📦',
-      image: mainImageData || '',
-      gallery: galleryImages.slice(),
-      color: colorName || '',
-      colorHex: colorHex || '',
-      sizes: sizes,
-      rating: ratingValue || 4.5,
-      features: ['منتج أصلي 100%', 'مواد آمنة', 'سهل الاستخدام'],
-      specs: { 'الفئة': cat, 'الجودة': 'عالية' },
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert('✅ تم نشر المنتج بنجاح!\nسيظهر في المتجر خلال ثوانٍ');
-    resetForm();
-    backToDash();
-  } catch(err) {
-    console.error(err);
-    alert('❌ خطأ في حفظ المنتج: ' + err.message);
-  }
-}
+                <!-- المخطط الدائري -->
+                <div class="bg-brand-card border border-brand-border rounded-xl p-5 flex flex-col">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-brand-gold"></i> توزيع الطلبات
+                    </h3>
+                    <div class="flex-1 flex justify-center items-center relative h-48">
+                        <canvas id="pieChart"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
+                            <span class="text-2xl font-black text-white">856</span>
+                            <span class="text-xs text-gray-400">طلب</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-pink"></span><span class="text-gray-300">المنتجات الجنسية</span></div>
+                            <span class="font-bold">45%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-gold"></span><span class="text-gray-300">زيوت ومرطبات</span></div>
+                            <span class="font-bold">20%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-600"></span><span class="text-gray-300">ألعاب الشرح</span></div>
+                            <span class="font-bold">15%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-function resetForm(){
-  document.getElementById('pName').value = '';
-  document.getElementById('pPrice').value = '';
-  document.getElementById('pBadge').value = '';
-  document.getElementById('pShortDesc').value = '';
-  document.getElementById('pDesc').value = '';
-  document.getElementById('pColor').value = '';
-  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-  selectedColor = '';
-  mainImageData = '';
-  galleryImages = [];
-  removeMainImage();
-  renderGallery();
-  document.getElementById('sizesList').innerHTML = '<div class="size-row"><input type="text" class="size-input" placeholder="المقاس"><input type="text" class="weight-input" placeholder="الوزن"><button class="size-remove" onclick="this.parentElement.remove()">✕</button></div>';
-  ratingValue = 0;
-  document.querySelectorAll('#ratingStars .star').forEach(s => s.classList.remove('active'));
-  document.getElementById('ratingText').textContent = '0';
-}
+            <!-- الجداول والقوائم -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- أحدث الطلبات -->
+                <div class="bg-brand-card border border-brand-border rounded-xl p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg flex items-center gap-2 text-white">
+                            <i class="fa-solid fa-list-check text-brand-gold"></i> أحدث الطلبات
+                        </h3>
+                        <a href="#" class="text-xs text-brand-pinkLight hover:text-brand-gold flex items-center gap-1 transition">عرض الكل <i class="fa-solid fa-arrow-left"></i></a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right">
+                            <thead class="text-gray-500 border-b border-brand-border">
+                                <tr>
+                                    <th class="pb-3 font-semibold"># الطلب</th>
+                                    <th class="pb-3 font-semibold">اسم العميل</th>
+                                    <th class="pb-3 font-semibold">المبلغ</th>
+                                    <th class="pb-3 font-semibold">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-brand-border/50">
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="py-3 text-gray-400">#4587</td>
+                                    <td class="py-3 font-semibold text-gray-200">أحمد محمد</td>
+                                    <td class="py-3 text-brand-gold font-bold">320 ر.س</td>
+                                    <td class="py-3"><span class="px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-xs">قيد التوصيل</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="py-3 text-gray-400">#4586</td>
+                                    <td class="py-3 font-semibold text-gray-200">سارة علي</td>
+                                    <td class="py-3 text-brand-gold font-bold">450 ر.س</td>
+                                    <td class="py-3"><span class="px-2 py-1 rounded bg-green-500/10 text-green-500 border border-green-500/20 text-xs">تم التوصيل</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="py-3 text-gray-400">#4585</td>
+                                    <td class="py-3 font-semibold text-gray-200">محمد عبدالله</td>
+                                    <td class="py-3 text-brand-gold font-bold">275 ر.س</td>
+                                    <td class="py-3"><span class="px-2 py-1 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 text-xs">قيد المعالجة</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="py-3 text-gray-400">#4584</td>
+                                    <td class="py-3 font-semibold text-gray-200">خالد أحمد</td>
+                                    <td class="py-3 text-brand-gold font-bold">690 ر.س</td>
+                                    <td class="py-3"><span class="px-2 py-1 rounded bg-green-500/10 text-green-500 border border-green-500/20 text-xs">تم التوصيل</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-/* ========== Products List ========== */
-async function loadAdminProducts(){
-  const list = document.getElementById('productsList');
-  list.innerHTML = '<div class="loading-msg">⏳ جاري التحميل...</div>';
-  try {
-    const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
-    if(snapshot.empty){
-      list.innerHTML = '<div class="empty-msg">لا توجد منتجات بعد. أضف منتجاً جديداً.</div>';
-      return;
-    }
-    list.innerHTML = '';
-    snapshot.forEach(doc => {
-      const p = doc.data();
-      const div = document.createElement('div');
-      div.className = 'admin-item';
-      div.innerHTML = '<div class="item-img">' + (p.image ? '<img src="'+p.image+'">' : (p.emoji || '📦')) + '</div><div class="item-info"><h4>'+p.name+'</h4><p>'+p.price+' SAR | '+p.cat+(p.color ? ' | '+p.color : '')+'</p></div><div class="item-actions"><button onclick="deleteProduct(\''+doc.id+'\')" title="حذف">🗑️</button></div>';
-      list.appendChild(div);
-    });
-  } catch(err) {
-    list.innerHTML = '<div class="empty-msg" style="color:#ff4d4d;">❌ خطأ: '+err.message+'</div>';
-  }
-}
+                <!-- المنتجات الأكثر مبيعاً -->
+                <div class="bg-brand-card border border-brand-border rounded-xl p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg flex items-center gap-2 text-white">
+                            <i class="fa-solid fa-crown text-brand-gold"></i> أكثر المنتجات مبيعاً
+                        </h3>
+                    </div>
+                    <div class="space-y-3">
+                        <!-- منتج 1 -->
+                        <div class="flex items-center justify-between p-3 bg-brand-dark rounded-lg border border-brand-border hover:border-brand-pink/50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-pink text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(163,24,83,0.5)]">1</span>
+                                <div class="w-10 h-10 rounded bg-gray-800 overflow-hidden"><img src="https://via.placeholder.com/150" class="w-full h-full object-cover opacity-50"></div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-200">هزاز متعدد السرعات</p>
+                                    <p class="text-[11px] text-gray-500">412 مبيع</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-left text-gray-600 text-xs"></i>
+                        </div>
+                        <!-- منتج 2 -->
+                        <div class="flex items-center justify-between p-3 bg-brand-dark rounded-lg border border-brand-border hover:border-brand-pink/50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-pink text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(163,24,83,0.5)]">2</span>
+                                <div class="w-10 h-10 rounded bg-gray-800 overflow-hidden"><img src="https://via.placeholder.com/150" class="w-full h-full object-cover opacity-50"></div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-200">حلقة تاخير مع اهتزاز</p>
+                                    <p class="text-[11px] text-gray-500">328 مبيع</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-left text-gray-600 text-xs"></i>
+                        </div>
+                        <!-- منتج 3 -->
+                        <div class="flex items-center justify-between p-3 bg-brand-dark rounded-lg border border-brand-border hover:border-brand-pink/50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-pink text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(163,24,83,0.5)]">3</span>
+                                <div class="w-10 h-10 rounded bg-gray-800 overflow-hidden"><img src="https://via.placeholder.com/150" class="w-full h-full object-cover opacity-50"></div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-200">زيت مساج فاخر</p>
+                                    <p class="text-[11px] text-gray-500">295 مبيع</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-left text-gray-600 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-async function deleteProduct(id){
-  if(!confirm('هل تريد حذف هذا المنتج؟')) return;
-  try {
-    await db.collection('products').doc(id).delete();
-    loadAdminProducts();
-  } catch(err) { alert('❌ خطأ: ' + err.message); }
-}
+            <!-- القسم السفلي (إعلان + مخزون + إشعارات) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+                <!-- إعلان -->
+                <div class="bg-gradient-to-r from-brand-pink/20 to-brand-dark rounded-xl p-5 border border-brand-pink/30 flex items-center justify-between relative overflow-hidden group">
+                    <div class="z-10 relative">
+                        <h3 class="text-brand-gold font-black text-lg">بوتيك السعادة</h3>
+                        <p class="text-white text-sm mt-1 mb-3">تجربة فريدة .. خصوصيتك أولويتنا</p>
+                        <button class="bg-brand-gold text-brand-black text-xs font-bold px-4 py-2 rounded hover:bg-yellow-500 transition shadow-[0_0_15px_rgba(212,175,55,0.4)]">تسوق الآن <i class="fa-solid fa-arrow-left mr-1"></i></button>
+                    </div>
+                    <div class="absolute -left-10 -bottom-10 opacity-20 group-hover:opacity-40 transition-opacity">
+                        <i class="fa-solid fa-gift text-9xl text-brand-pink"></i>
+                    </div>
+                </div>
 
-/* ========== Orders ========== */
-async function loadAdminOrders(){
-  const list = document.getElementById('ordersList');
-  list.innerHTML = '<div class="loading-msg">⏳ جاري التحميل...</div>';
-  try {
-    const snapshot = await db.collection('orders').orderBy('createdAt', 'desc').get();
-    if(snapshot.empty){
-      list.innerHTML = '<div class="empty-msg">لا توجد طلبات بعد.</div>';
-      return;
-    }
-    list.innerHTML = '';
-    snapshot.forEach(doc => {
-      const o = doc.data();
-      const itemsHTML = (o.items || []).map(i => '<li>• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR</li>').join('');
-      const div = document.createElement('div');
-      div.className = 'order-card';
-      div.innerHTML = '<h4>📦 طلب رقم '+o.orderId+'</h4><p><strong>التاريخ:</strong> '+o.date+'</p><p><strong>العميل:</strong> '+o.customer+'</p><p><strong>الجوال:</strong> '+o.phone+'</p><p><strong>المدينة:</strong> '+(o.city||'-')+' | '+(o.district||'-')+'</p><ul class="order-items">'+itemsHTML+'</ul><p style="color:var(--pink);font-weight:700;">الإجمالي: '+o.total+' SAR</p>';
-      list.appendChild(div);
-    });
-  } catch(err) {
-    list.innerHTML = '<div class="empty-msg" style="color:#ff4d4d;">❌ خطأ: '+err.message+'</div>';
-  }
-}
+                <!-- المخزون -->
+                <div class="bg-brand-card border border-brand-border rounded-xl p-5 flex flex-col items-center justify-center relative">
+                    <h3 class="font-bold text-sm mb-2 w-full text-right absolute top-4 right-5 flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-brand-gold"></i> المخزون
+                    </h3>
+                    <div class="relative w-28 h-28 mt-6">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
+                            <path class="text-brand-gold" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-xl font-black text-white">78%</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between w-full mt-4 text-xs">
+                        <div class="text-center"><span class="block text-green-500 font-bold">1,993</span><span class="text-gray-500">متوفر</span></div>
+                        <div class="text-center"><span class="block text-yellow-500 font-bold">567</span><span class="text-gray-500">قليل</span></div>
+                    </div>
+                </div>
 
-/* ========== Settings ========== */
-async function saveSettings(){
-  try {
-    const whatsapp = document.getElementById('setWhatsapp').value.trim();
-    const email = document.getElementById('setEmail').value.trim();
-    const storeName = document.getElementById('setStoreName').value.trim();
-    
-    await db.collection('settings').doc('main').set({
-      storeName: storeName || 'بوتيك السعادة',
-      whatsapp: whatsapp || '+966580700000',
-      email: email || 'mtjrars805@gmail.com',
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    
-    alert('✅ تم حفظ الإعدادات بنجاح!\nستظهر التغييرات في المتجر فوراً');
-  } catch(err) { 
-    alert('❌ خطأ: ' + err.message); 
-  }
-}
+                <!-- الإشعارات -->
+                <div class="bg-brand-card border border-brand-border rounded-xl p-5 relative">
+                    <h3 class="font-bold text-sm mb-4 flex items-center gap-2">
+                        <i class="fa-regular fa-bell text-brand-gold"></i> الإشعارات الأخيرة
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 rounded-full bg-brand-pink mt-1.5"></div>
+                            <div><p class="text-gray-300">تم استلام طلب جديد <span class="text-brand-gold">#4587</span></p><p class="text-gray-600 text-[10px] mt-1">منذ 10 دقائق</p></div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 rounded-full bg-brand-gold mt-1.5"></div>
+                            <div><p class="text-gray-300">تم إضافة منتج جديد إلى المتجر</p><p class="text-gray-600 text-[10px] mt-1">منذ 45 دقيقة</p></div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 rounded-full bg-green-500 mt-1.5"></div>
+                            <div><p class="text-gray-300">تم تحديث حالة طلب <span class="text-brand-gold">#4586</span></p><p class="text-gray-600 text-[10px] mt-1">منذ ساعتين</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-/* تحميل الإعدادات عند فتح اللوحة */
-async function loadSettings(){
-  try {
-    const doc = await db.collection('settings').doc('main').get();
-    if(doc.exists){
-      const s = doc.data();
-      if(s.storeName) document.getElementById('setStoreName').value = s.storeName;
-      if(s.whatsapp) document.getElementById('setWhatsapp').value = s.whatsapp;
-      if(s.email) document.getElementById('setEmail').value = s.email;
-    }
-  } catch(err){ 
-    console.log('Settings load error:', err); 
-  }
-}
+        </div>
+    </main>
 
-/* ========== Check Login ========== */
-window.addEventListener('DOMContentLoaded', () => {
-  if(sessionStorage.getItem('adminLoggedIn') === '1'){
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboard').classList.add('active');
-    loadSettings();
-  }
-});
-</script>
+    <!-- سكربت الرسوم البيانية -->
+    <script>
+        // إعدادات الخط الافتراضي للمخططات
+        Chart.defaults.font.family = "'Cairo', sans-serif";
+        Chart.defaults.color = '#9ca3af';
+
+        // 1. مخطط المبيعات (Bar Chart)
+        const ctxSales = document.getElementById('salesChart').getContext('2d');
+        
+        // إنشاء تدرج لوني فخم للأعمدة
+        let gradientPink = ctxSales.createLinearGradient(0, 0, 0, 400);
+        gradientPink.addColorStop(0, '#d81b60');
+        gradientPink.addColorStop(1, 'rgba(163, 24, 83, 0.1)');
+
+        new Chart(ctxSales, {
+            type: 'bar',
+            data: {
+                labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+                datasets: [{
+                    label: 'المبيعات (ر.س)',
+                    data: [1500, 2300, 3200, 2800, 3500, 4200, 5000],
+                    backgroundColor: gradientPink,
+                    borderColor: '#d81b60',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    barThickness: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 2. المخطط الدائري (Doughnut Chart)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['المنتجات الجنسية', 'زيوت ومرطبات', 'ألعاب الشرح', 'أدوات أخرى', 'إكسسوارات'],
+                datasets: [{
+                    data: [45, 20, 15, 10, 10],
+                    backgroundColor: [
+                        '#d81b60', // وردي
+                        '#d4af37', // ذهبي
+                        '#6b21a8', // بنفسجي
+                        '#1f2937', // رمادي غامق
+                        '#4b5563'  // رمادي فاتح
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', // لجعله رفيعاً مثل الصورة
+                plugins: {
+                    legend: { display: false } // إخفاء المفتاح الافتراضي لأننا صممناه يدوياً في HTML
+                }
+            }
+        });
+    </script>
 </body>
-      </html>
+                          </html>
