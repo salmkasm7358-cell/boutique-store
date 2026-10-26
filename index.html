@@ -51,13 +51,17 @@
   .page-header p{color:#888;font-size:15px;}
   .back-btn{display:inline-flex;align-items:center;gap:8px;color:var(--pink);font-size:14px;cursor:pointer;margin-bottom:15px;padding:8px 18px;border:1px solid rgba(255,20,147,.4);border-radius:50px;transition:.3s;background:transparent;}
   .back-btn:hover{background:var(--pink);color:#fff;box-shadow:0 5px 20px rgba(255,20,147,.4);}
+  
+  /* تحديث تصميم الأقسام ليدعم الصور */
   .categories{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px;max-width:1000px;margin:0 auto;}
   .cat-card{background:transparent;border:none;text-align:center;cursor:pointer;transition:.35s;position:relative;}
   .cat-card:hover{transform:translateY(-5px);}
-  .cat-icon{width:90px;height:90px;margin:0 auto 10px;border-radius:50%;background:linear-gradient(135deg,#1a0a15,#0a0a0a);border:2px solid rgba(255,20,147,.5);display:flex;align-items:center;justify-content:center;font-size:38px;color:var(--pink);transition:.3s;box-shadow:0 0 20px rgba(255,20,147,.25);}
+  .cat-icon{width:90px;height:90px;margin:0 auto 10px;border-radius:50%;background:linear-gradient(135deg,#1a0a15,#0a0a0a);border:2px solid rgba(255,20,147,.5);display:flex;align-items:center;justify-content:center;font-size:38px;color:var(--pink);transition:.3s;box-shadow:0 0 20px rgba(255,20,147,.25);overflow:hidden;}
+  .cat-icon img{width:100%;height:100%;object-fit:cover;}
   .cat-card:hover .cat-icon{border-color:var(--pink);box-shadow:0 0 30px rgba(255,20,147,.6);background:linear-gradient(135deg,#2a0a1e,#1a0010);}
   .cat-card h4{color:#fff;font-size:13px;margin-bottom:4px;}
   .cat-badge{position:absolute;top:0;right:8px;background:var(--pink);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;box-shadow:0 0 8px rgba(255,20,147,.6);}
+  
   .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;max-width:1200px;margin:0 auto;}
   .product{background:linear-gradient(160deg,#1a0a15,#0a0a0a);border:1px solid rgba(255,20,147,.25);border-radius:14px;overflow:hidden;transition:.35s;cursor:pointer;position:relative;}
   .product:hover{transform:translateY(-5px);border-color:var(--pink);box-shadow:0 10px 30px rgba(255,20,147,.3);}
@@ -218,15 +222,9 @@
   </div>
   <section>
     <div class="section-title"><span class="crown">💎</span><h2>تسوق حسب القسم</h2></div>
-    <div class="categories">
-      <div class="cat-card" onclick="goToCategory('رجالية')"><div class="cat-icon">⛓️</div><h4>الألعاب الرجالية</h4></div>
-      <div class="cat-card" onclick="goToCategory('نسائية')"><div class="cat-icon">💖</div><h4>ألعاب نسائية</h4></div>
-      <div class="cat-card" onclick="goToCategory('كريمات')"><div class="cat-icon">🧴</div><h4>كريمات وزيوت</h4></div>
-      <div class="cat-card" onclick="goToCategory('ملابس')"><div class="cat-icon">👙</div><h4>ملابس داخلية</h4></div>
-      <div class="cat-card" onclick="goToCategory('إكسسوارات')"><div class="cat-icon">🔗</div><h4>إكسسوارات</h4></div>
-      <div class="cat-card" onclick="goToCategory('زوجية')"><div class="cat-icon">💑</div><h4>ألعاب زوجية</h4></div>
-      <div class="cat-card" onclick="goToCategory('عناية')"><div class="cat-icon">💧</div><h4>عناية شخصية</h4></div>
-      <div class="cat-card" onclick="goToCategory('جديدة')"><div class="cat-badge">جديد</div><div class="cat-icon">🔥</div><h4>منتجات جديدة</h4></div>
+    <!-- سيتم تحميل الأقسام هنا ديناميكياً -->
+    <div class="categories" id="homeCategories">
+      <div class="loading">⏳ جاري تحميل الأقسام...</div>
     </div>
   </section>
   <section style="background:linear-gradient(180deg,#0a0a0a,#150510);padding-top:15px;">
@@ -253,15 +251,9 @@
   </div>
   <section>
     <div class="section-title"><span class="crown">💎</span><h2>أقسام المنتجات</h2></div>
-    <div class="categories">
-      <div class="cat-card" onclick="goToCategory('رجالية')"><div class="cat-icon">⛓️</div><h4>الألعاب الرجالية</h4></div>
-      <div class="cat-card" onclick="goToCategory('نسائية')"><div class="cat-icon">💖</div><h4>ألعاب نسائية</h4></div>
-      <div class="cat-card" onclick="goToCategory('كريمات')"><div class="cat-icon">🧴</div><h4>كريمات وزيوت</h4></div>
-      <div class="cat-card" onclick="goToCategory('ملابس')"><div class="cat-icon">👙</div><h4>ملابس داخلية</h4></div>
-      <div class="cat-card" onclick="goToCategory('إكسسوارات')"><div class="cat-icon">🔗</div><h4>إكسسوارات</h4></div>
-      <div class="cat-card" onclick="goToCategory('زوجية')"><div class="cat-icon">💑</div><h4>ألعاب زوجية</h4></div>
-      <div class="cat-card" onclick="goToCategory('عناية')"><div class="cat-icon">💧</div><h4>عناية شخصية</h4></div>
-      <div class="cat-card" onclick="goToCategory('جديدة')"><div class="cat-badge">جديد</div><div class="cat-icon">🔥</div><h4>منتجات جديدة</h4></div>
+    <!-- سيتم تحميل الأقسام هنا ديناميكياً -->
+    <div class="categories" id="shopCategories">
+      <div class="loading">⏳ جاري تحميل الأقسام...</div>
     </div>
   </section>
   <section style="background:linear-gradient(180deg,#0a0a0a,#150510);">
@@ -466,8 +458,9 @@ const EMAILJS_SERVICE_ID = 'service_yoe182u';
 const EMAILJS_TEMPLATE_ID = 'template_ycsjuwa';
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
-/* ========== Products from Firestore ========== */
+/* ========== Products & Categories ========== */
 let products = [];
+let categories = [];
 let cart = JSON.parse(localStorage.getItem('boutiqueCart') || '[]');
 let wishlist = JSON.parse(localStorage.getItem('boutiqueWishlist') || '[]');
 
@@ -478,7 +471,7 @@ function updateCartCount(){const count = cart.reduce((s,i)=>s+i.qty,0); const el
 /* ========== تحميل الإعدادات من Firebase ========== */
 async function loadSettings(){
   try {
-    const doc = await db.collection('settings').doc('main').get();
+    const doc = await db.collection('settings').doc('general').get();
     if(doc.exists){
       const s = doc.data();
       if(s.whatsapp) storeSettings.whatsapp = s.whatsapp;
@@ -486,75 +479,101 @@ async function loadSettings(){
       if(s.storeName) storeSettings.storeName = s.storeName;
       applySettings();
     }
-  } catch(err){ 
-    console.log('Settings load error:', err); 
+  } catch(err){ console.log('Settings load error:', err); }
+}
+
+function applySettings(){
+  const cleanNumber = storeSettings.whatsapp.replace(/[^0-9]/g, '');
+  document.querySelectorAll('.wa-link').forEach(a => { a.href = 'https://wa.me/' + cleanNumber; });
+  document.querySelectorAll('.email-link').forEach(a => {
+    a.href = 'mailto:' + storeSettings.email;
+    if(a.textContent.includes('@')){ a.textContent = storeSettings.email; }
+  });
+  document.querySelectorAll('.contact-card a').forEach(a => {
+    const text = a.textContent.trim();
+    if(/^\+?\d[\d\s]+$/.test(text)){ a.textContent = storeSettings.whatsapp; }
+  });
+}
+
+function watchSettings(){
+  db.collection('settings').doc('general').onSnapshot(doc => {
+    if(doc.exists){
+      const s = doc.data();
+      if(s.whatsapp) storeSettings.whatsapp = s.whatsapp;
+      if(s.email) storeSettings.email = s.email;
+      if(s.storeName) storeSettings.storeName = s.storeName;
+      applySettings();
+    }
+  });
+}
+
+/* ========== تحميل الأقسام (جديد) ========== */
+async function loadCategories(){
+  try {
+    const snapshot = await db.collection('categories')
+      .where("status", "==", "active") // فقط الأقسام المفعلة
+      .orderBy("order", "asc") // مرتبة حسب الترتيب
+      .get();
+      
+    categories = [];
+    snapshot.forEach(doc => {
+      categories.push({ id: doc.id, ...doc.data() });
+    });
+    
+    renderCategories();
+  } catch(err) {
+    console.error('Error loading categories:', err);
+    // محاولة بدون ترتيب إذا فشل
+    try {
+      const snapshot = await db.collection('categories').where("status", "==", "active").get();
+      categories = [];
+      snapshot.forEach(doc => categories.push({ id: doc.id, ...doc.data() }));
+      renderCategories();
+    } catch(e) { console.log(e); }
   }
 }
 
-/* ========== تطبيق الإعدادات ========== */
-function applySettings(){
-  const cleanNumber = storeSettings.whatsapp.replace(/[^0-9]/g, '');
+function renderCategories() {
+  const homeContainer = document.getElementById('homeCategories');
+  const shopContainer = document.getElementById('shopCategories');
   
-  // تحديث جميع روابط الواتساب
-  document.querySelectorAll('.wa-link').forEach(a => {
-    a.href = 'https://wa.me/' + cleanNumber;
-  });
-  
-  // تحديث جميع روابط البريد
-  document.querySelectorAll('.email-link').forEach(a => {
-    a.href = 'mailto:' + storeSettings.email;
-    if(a.textContent.includes('@')){
-      a.textContent = storeSettings.email;
-    }
-  });
-  
-  // تحديث نص رقم الواتساب في بطاقة الاتصال
-  document.querySelectorAll('.contact-card a').forEach(a => {
-    const text = a.textContent.trim();
-    if(/^\+?\d[\d\s]+$/.test(text)){
-      a.textContent = storeSettings.whatsapp;
-    }
-  });
+  if(categories.length === 0) {
+    const emptyHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">لا توجد أقسام حالياً.</div>';
+    if(homeContainer) homeContainer.innerHTML = emptyHTML;
+    if(shopContainer) shopContainer.innerHTML = emptyHTML;
+    return;
+  }
+
+  const categoriesHTML = categories.map(cat => {
+    const imgHTML = cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : '📦';
+    return `
+      <div class="cat-card" onclick="goToCategory('${cat.name}')">
+        <div class="cat-icon">${imgHTML}</div>
+        <h4>${cat.name}</h4>
+      </div>
+    `;
+  }).join('');
+
+  if(homeContainer) homeContainer.innerHTML = categoriesHTML;
+  if(shopContainer) shopContainer.innerHTML = categoriesHTML;
 }
 
-/* ========== مراقبة تغييرات الإعدادات مباشرة ========== */
-function watchSettings(){
-  db.collection('settings').doc('main').onSnapshot(doc => {
-    if(doc.exists){
-      const s = doc.data();
-      if(s.whatsapp) storeSettings.whatsapp = s.whatsapp;
-      if(s.email) storeSettings.email = s.email;
-      if(s.storeName) storeSettings.storeName = s.storeName;
-      applySettings();
-    }
-  });
-}
-
-/* ========== Products ========== */
+/* ========== تحميل المنتجات ========== */
 async function loadProducts(){
   try {
     const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
     products = [];
-    snapshot.forEach(doc => {
-      products.push({ id: doc.id, ...doc.data() });
-    });
+    snapshot.forEach(doc => { products.push({ id: doc.id, ...doc.data() }); });
     renderAllProducts();
     return true;
   } catch(err) {
-    console.error('Error loading products:', err);
-    // إذا فشل الترتيب، جرب بدون ترتيب
     try {
       const snapshot = await db.collection('products').get();
       products = [];
-      snapshot.forEach(doc => {
-        products.push({ id: doc.id, ...doc.data() });
-      });
+      snapshot.forEach(doc => { products.push({ id: doc.id, ...doc.data() }); });
       renderAllProducts();
       return true;
-    } catch(err2) {
-      console.error('Error loading products (no order):', err2);
-      return false;
-    }
+    } catch(err2) { return false; }
   }
 }
 
@@ -564,51 +583,41 @@ function renderAllProducts(){
   
   if(products.length === 0){
     const emptyHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;font-size:15px;">لا توجد منتجات بعد. أدخل إلى <a href="admin.html" style="color:var(--pink);text-decoration:underline;">لوحة التحكم</a> لإضافة منتجات.</div>';
-    featured.innerHTML = emptyHTML;
-    all.innerHTML = emptyHTML;
+    if(featured) featured.innerHTML = emptyHTML;
+    if(all) all.innerHTML = emptyHTML;
     return;
   }
-  
-  featured.innerHTML = products.slice(0,6).map(productCardHTML).join('');
-  all.innerHTML = products.map(productCardHTML).join('');
+  if(featured) featured.innerHTML = products.slice(0,6).map(productCardHTML).join('');
+  if(all) all.innerHTML = products.map(productCardHTML).join('');
 }
 
-/* ========== Real-time updates with error handling ========== */
+/* ========== Real-time Products ========== */
 db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-  try {
-    products = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      // تأكد من وجود createdAt لتجنب الأخطاء
-      if (!data.createdAt) {
-        data.createdAt = { toDate: () => new Date() };
-      }
-      products.push({ id: doc.id, ...data });
-    });
-    renderAllProducts();
-  } catch(err) {
-    console.error('Error in real-time update:', err);
-    // في حال حدوث خطأ، جرب جلب المنتجات بدون ترتيب
-    db.collection('products').get().then(snap => {
-      products = [];
-      snap.forEach(doc => {
-        products.push({ id: doc.id, ...doc.data() });
-      });
-      renderAllProducts();
-    });
-  }
+  products = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if (!data.createdAt) { data.createdAt = { toDate: () => new Date() }; }
+    products.push({ id: doc.id, ...data });
+  });
+  renderAllProducts();
 }, err => {
-  console.error('Snapshot error:', err);
-  // في حال فشل الـ onSnapshot، استخدم get العادي
   db.collection('products').get().then(snap => {
     products = [];
-    snap.forEach(doc => {
-      products.push({ id: doc.id, ...doc.data() });
-    });
+    snap.forEach(doc => { products.push({ id: doc.id, ...doc.data() }); });
     renderAllProducts();
   });
 });
 
+/* ========== Real-time Categories ========== */
+db.collection('categories').where("status", "==", "active").orderBy("order", "asc").onSnapshot(snapshot => {
+  categories = [];
+  snapshot.forEach(doc => { categories.push({ id: doc.id, ...doc.data() }); });
+  renderCategories();
+}, err => {
+  console.log("Live categories update error", err);
+});
+
+/* ========== دوال السلة والمفضلة ========== */
 function addToCart(id, event){
   const p = products.find(x=>x.id===id);
   if(!p) return;
@@ -689,47 +698,20 @@ async function submitOrder(){
   const orderDate = new Date().toLocaleString('ar-SA');
   const itemsText = cart.map(i=>'• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR').join('\n');
   const itemsHTML = cart.map(i=>'<div style="color:#ddd;padding:6px 0;border-bottom:1px dashed #333;">• '+i.name+' × '+i.qty+' = '+(i.price*i.qty)+' SAR</div>').join('');
-
-  // رقم الواتساب الديناميكي
   const cleanNumber = storeSettings.whatsapp.replace(/[^0-9]/g, '');
 
   try {
-    // حفظ الطلب في Firestore
     try {
       await db.collection('orders').add({
-        orderId: orderId,
-        date: orderDate,
-        customer: name,
-        phone: phone,
-        city: city,
-        district: district,
-        address: address,
-        payment: payment,
-        items: cart.map(i=>({name:i.name, qty:i.qty, price:i.price})),
-        total: total,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        orderId: orderId, date: orderDate, customer: name, phone: phone, city: city, district: district, address: address, payment: payment, items: cart.map(i=>({name:i.name, qty:i.qty, price:i.price})), total: total, createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch(e){ console.log('Firestore order error:', e); }
 
-    // إرسال البريد الإلكتروني
     try {
-      const templateParams = { 
-        email: storeSettings.email, 
-        order_id: orderId, 
-        order_date: orderDate, 
-        customer_name: name, 
-        customer_phone: phone, 
-        customer_city: city, 
-        customer_district: district, 
-        customer_address: address, 
-        payment_method: payment, 
-        order_items: itemsHTML, 
-        order_total: total 
-      };
+      const templateParams = { email: storeSettings.email, order_id: orderId, order_date: orderDate, customer_name: name, customer_phone: phone, customer_city: city, customer_district: district, customer_address: address, payment_method: payment, order_items: itemsHTML, order_total: total };
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
     } catch(e){ console.log('Email error:', e); }
 
-    // إرسال واتساب بالرقم الديناميكي
     const waText = '🛍️ طلب جديد من بوتيك السعادة\n\n📋 رقم الطلب: '+orderId+'\n\n👤 الاسم: '+name+'\n📱 الجوال: '+phone+'\n🏙️ المدينة: '+city+'\n🏘️ الحي: '+district+'\n📍 العنوان الوطني: '+address+'\n💳 طريقة الدفع: '+payment+'\n\n📦 المنتجات:\n'+itemsText+'\n\n💰 الإجمالي: '+total+' SAR';
     window.open('https://wa.me/' + cleanNumber + '?text=' + encodeURIComponent(waText), '_blank');
 
@@ -737,7 +719,6 @@ async function submitOrder(){
     alert('✅ تم إرسال طلبك بنجاح!\n📧 وصلنا طلبك على البريد\nسنتواصل معك قريباً');
     showPage('home');
   } catch(err){
-    console.log(err);
     alert('⚠️ حدث خطأ في الإرسال. سيتم تحويلك لواتساب مباشرة.');
     const waText = '🛍️ طلب جديد\n\n👤 الاسم: '+name+'\n📱 الجوال: '+phone+'\n🏙️ المدينة: '+city+'\n🏘️ الحي: '+district+'\n📍 العنوان: '+address+'\n💳 الدفع: '+payment+'\n\n📦 المنتجات:\n'+itemsText+'\n\n💰 الإجمالي: '+total+' SAR';
     window.open('https://wa.me/' + cleanNumber + '?text=' + encodeURIComponent(waText), '_blank');
@@ -760,14 +741,21 @@ function showPage(name){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function goToCategory(cat){
-  const titles = {'رجالية':'الألعاب الرجالية','نسائية':'ألعاب نسائية','كريمات':'كريمات وزيوت','ملابس':'ملابس داخلية','إكسسوارات':'إكسسوارات','جديدة':'منتجات جديدة','زوجية':'ألعاب زوجية','عناية':'عناية شخصية'};
-  document.getElementById('categoryTitle').textContent = titles[cat] || cat;
-  document.getElementById('categorySub').textContent = 'تصفح منتجات قسم '+(titles[cat]||cat);
-  const filtered = products.filter(p=>p.cat===cat);
+/* ========== التنقل للقسم (محدث ليعمل بالاسم) ========== */
+function goToCategory(catName){
+  document.getElementById('categoryTitle').textContent = catName;
+  document.getElementById('categorySub').textContent = 'تصفح منتجات قسم ' + catName;
+  
+  // تصفية المنتجات بناءً على اسم القسم
+  const filtered = products.filter(p => p.category === catName);
   const grid = document.getElementById('categoryProducts');
-  if(filtered.length === 0){ grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;">لا توجد منتجات في هذا القسم حالياً</div>'; }
-  else { grid.innerHTML = filtered.map(productCardHTML).join(''); }
+  
+  if(filtered.length === 0){ 
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:40px;">لا توجد منتجات في هذا القسم حالياً</div>'; 
+  }
+  else { 
+    grid.innerHTML = filtered.map(productCardHTML).join(''); 
+  }
   showPage('category');
 }
 
@@ -790,42 +778,22 @@ function openModal(id){
 }
 
 function closeModal(){ document.getElementById('productModal').classList.remove('active'); document.body.style.overflow = ''; }
-
-function toggleFaq(el){
-  el.classList.toggle('open');
-}
-
-function showToast(msg){
-  const t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
-}
+function toggleFaq(el){ el.classList.toggle('open'); }
+function showToast(msg){ const t = document.getElementById('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200); }
 
 /* ========== Initialize ========== */
 document.addEventListener('DOMContentLoaded', function(){
-  console.log('🚀 بدء تشغيل المتجر...');
-  
-  // 1. تشغيل الوظائف الأساسية
   loadSettings();
   watchSettings();
   updateCartCount();
-
-  // 2. محاولة جلب المنتجات بطريقة آمنة
+  loadCategories(); // تحميل الأقسام
+  
   loadProducts().then((success) => {
-    if (success) {
-      console.log('✅ تم تحميل المنتجات بنجاح');
-    } else {
-      console.error('❌ فشل تحميل المنتجات');
-      document.getElementById('featuredProducts').innerHTML = 
-        '<div style="grid-column:1/-1;text-align:center;color:#ff4d4d;padding:40px;">' +
-        '❌ تعذر تحميل المنتجات. تأكد من اتصالك بالإنترنت.<br>' +
-        '<button onclick="location.reload()" class="btn-pink" style="margin-top:15px;">إعادة المحاولة</button>' +
-        '</div>';
+    if (!success) {
+      document.getElementById('featuredProducts').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ff4d4d;padding:40px;">❌ تعذر تحميل المنتجات. تأكد من اتصالك بالإنترنت.<br><button onclick="location.reload()" class="btn-pink" style="margin-top:15px;">إعادة المحاولة</button></div>';
     }
   });
 });
 </script>
 </body>
-</html>
+                                                                                                            </html>
