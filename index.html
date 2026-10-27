@@ -627,13 +627,17 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        /* ========== 4. تحميل البيانات ========== */
+        /* ========== 4. تحميل البيانات (تم التعديل لحل المشكلة) ========== */
         async function loadData() {
             try {
-                // تحميل الأقسام
-                const catSnap = await db.collection("categories").where("status", "==", "active").orderBy("order", "asc").get();
+                // 1. جلب الأقسام بدون ترتيب أو فلترة معقدة
+                const catSnap = await db.collection("categories").get();
                 categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
+                // الفلترة والترتيب برمجياً لتجنب أخطاء Firebase
+                categories = categories.filter(c => c.status === 'active');
+                categories.sort((a, b) => (a.order || 0) - (b.order || 0));
+
                 const catHtml = categories.map(cat => {
                     const img = cat.image ? `<img src="${cat.image}">` : `<i class="fa-solid fa-box" style="font-size:24px; color:var(--gold);"></i>`;
                     return `
@@ -644,13 +648,20 @@
                     `;
                 }).join('');
 
-                document.getElementById('homeCategories').innerHTML = catHtml;
-                document.getElementById('allCategoriesPage').innerHTML = catHtml;
+                document.getElementById('homeCategories').innerHTML = catHtml || '<div style="color:#777; width:100%; text-align:center;">لا توجد أقسام</div>';
+                document.getElementById('allCategoriesPage').innerHTML = catHtml || '<div style="color:#777; width:100%; text-align:center;">لا توجد أقسام</div>';
                 document.getElementById('sideMenuCategories').innerHTML = categories.map(c => `<li onclick="goToCategory('${c.name}')">${c.name} <i class="fa-solid fa-chevron-left" style="font-size:10px;"></i></li>`).join('');
 
-                // تحميل المنتجات
-                const prodSnap = await db.collection("products").orderBy("createdAt", "desc").get();
+                // 2. جلب المنتجات بدون ترتيب معقد
+                const prodSnap = await db.collection("products").get();
                 products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // ترتيب المنتجات برمجياً (الأحدث أولاً)
+                products.sort((a, b) => {
+                    const timeA = a.createdAt ? a.createdAt.seconds : 0;
+                    const timeB = b.createdAt ? b.createdAt.seconds : 0;
+                    return timeB - timeA;
+                });
                 
                 renderHomeBestSellers();
                 renderShopProducts(products);
@@ -993,4 +1004,4 @@
         });
     </script>
 </body>
-    </html>
+                </html>
