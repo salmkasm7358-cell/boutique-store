@@ -63,15 +63,18 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* البانر الجديد المتجاوب */
+        /* البانر الجديد المطابق للصورة */
         .page-banner { 
             background-color: #000;
-            background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg'); /* تم استخدام رابط الصورة المرفقة */
-            background-size: contain; /* يضمن ظهور الصورة كاملة بدون قص */
+            /* تم استخدام رابط الصورة المرفقة مباشرة */
+            background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg'); 
+            background-size: cover; 
             background-position: center;
             background-repeat: no-repeat;
             width: 100%;
-            aspect-ratio: 2.5 / 1; /* يحافظ على أبعاد الصورة على الجوال */
+            /* تحديد الارتفاع ليتناسب مع الجوال */
+            min-height: 200px; 
+            height: 25vh;
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -80,8 +83,8 @@
             position: relative; 
             border-bottom: 2px solid var(--gold); 
         }
-        
-        /* إخفاء النصوص القديمة من البانر لأن الصورة تحتوي على النصوص */
+
+        /* إخفاء النصوص القديمة لأن الصورة تحتوي على النص والشعار */
         .page-banner h1, .page-banner p, .page-banner .btn { display: none !important; }
         
         /* الأزرار */
@@ -225,7 +228,7 @@
 
     <!-- 1. الصفحة الرئيسية -->
     <div id="page-home" class="page-section active">
-        <!-- البانر الجديد -->
+        <!-- البانر الجديد المطابق للصورة -->
         <div class="page-banner"></div>
 
         <div class="container mt-3">
@@ -1014,4 +1017,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
