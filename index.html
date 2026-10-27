@@ -63,11 +63,26 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* البانرات */
-        .page-banner { background: url('https://raw.githubusercontent.com/salmkasm7358-cell/boutique-store/refs/heads/main/IMG-20261006-WA0000(1).jpg') center/cover no-repeat; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; border-bottom: 2px solid var(--gold); }
-        .page-banner::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
-        .page-banner h1 { position: relative; font-size: 26px; color: var(--gold); font-weight: 900; margin-bottom: 5px; text-shadow: 0 0 15px rgba(212,175,55,0.6); }
-        .page-banner p { position: relative; color: #ddd; font-size: 13px; }
+        /* البانر الجديد المتجاوب */
+        .page-banner { 
+            background-color: #000;
+            background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg'); /* تم استخدام رابط الصورة المرفقة */
+            background-size: contain; /* يضمن ظهور الصورة كاملة بدون قص */
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            aspect-ratio: 2.5 / 1; /* يحافظ على أبعاد الصورة على الجوال */
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            position: relative; 
+            border-bottom: 2px solid var(--gold); 
+        }
+        
+        /* إخفاء النصوص القديمة من البانر لأن الصورة تحتوي على النصوص */
+        .page-banner h1, .page-banner p, .page-banner .btn { display: none !important; }
         
         /* الأزرار */
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-family: inherit; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
@@ -210,11 +225,8 @@
 
     <!-- 1. الصفحة الرئيسية -->
     <div id="page-home" class="page-section active">
-        <div class="page-banner" style="min-height: 220px;">
-            <h1>لأن سعادتكما<br><span style="color:var(--pink);">تستحق الأفضل</span></h1>
-            <p>منتجات عالية الجودة .. راحة أكبر وتجربة أروع</p>
-            <button class="btn btn-pink mt-3" onclick="showPage('shop')">تسوق الآن</button>
-        </div>
+        <!-- البانر الجديد -->
+        <div class="page-banner"></div>
 
         <div class="container mt-3">
             <h2 style="color:var(--gold); font-size:16px; margin-bottom:10px;"><i class="fa-solid fa-fire"></i> تسوق حسب القسم</h2>
@@ -627,14 +639,13 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        /* ========== 4. تحميل البيانات (تم التعديل لحل المشكلة) ========== */
+        /* ========== 4. تحميل البيانات ========== */
         async function loadData() {
             try {
-                // 1. جلب الأقسام بدون ترتيب أو فلترة معقدة
+                // جلب الأقسام
                 const catSnap = await db.collection("categories").get();
                 categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
-                // الفلترة والترتيب برمجياً لتجنب أخطاء Firebase
                 categories = categories.filter(c => c.status === 'active');
                 categories.sort((a, b) => (a.order || 0) - (b.order || 0));
 
@@ -652,11 +663,10 @@
                 document.getElementById('allCategoriesPage').innerHTML = catHtml || '<div style="color:#777; width:100%; text-align:center;">لا توجد أقسام</div>';
                 document.getElementById('sideMenuCategories').innerHTML = categories.map(c => `<li onclick="goToCategory('${c.name}')">${c.name} <i class="fa-solid fa-chevron-left" style="font-size:10px;"></i></li>`).join('');
 
-                // 2. جلب المنتجات بدون ترتيب معقد
+                // جلب المنتجات
                 const prodSnap = await db.collection("products").get();
                 products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
-                // ترتيب المنتجات برمجياً (الأحدث أولاً)
                 products.sort((a, b) => {
                     const timeA = a.createdAt ? a.createdAt.seconds : 0;
                     const timeB = b.createdAt ? b.createdAt.seconds : 0;
@@ -1004,4 +1014,4 @@
         });
     </script>
 </body>
-                </html>
+</html>
