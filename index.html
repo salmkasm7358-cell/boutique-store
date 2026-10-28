@@ -34,10 +34,8 @@
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
         
-        /* الشريط العلوي */
         .top-bar { background: linear-gradient(90deg, #000, #1a0a15, #000); color: var(--pink); text-align: center; padding: 8px; font-size: 12px; border-bottom: 1px solid var(--pink-dark); }
         
-        /* الهيدر */
         header { position: sticky; top: 0; z-index: 1000; background: rgba(5,5,5,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--gold); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .logo-text { font-size: 24px; font-weight: 900; color: var(--gold); font-family: 'Times New Roman', serif; text-shadow: 0 0 10px rgba(212,175,55,0.5); }
@@ -47,7 +45,6 @@
         .cart-badge { position: absolute; top: -8px; left: -8px; background: var(--pink); color: white; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .menu-btn { cursor: pointer; }
 
-        /* القائمة الجانبية */
         .side-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--bg-card); z-index: 2000; transition: 0.3s; border-left: 1px solid var(--gold); padding: 20px; overflow-y: auto; }
         .side-menu.active { right: 0; }
         .side-menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1999; display: none; }
@@ -56,24 +53,36 @@
         .side-menu ul li { padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #ddd; transition: 0.3s; font-size: 14px; }
         .side-menu ul li:hover { color: var(--pink); padding-right: 5px; }
 
-        /* الصفحات */
         .page-section { display: none; animation: fadeIn 0.4s ease; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* بانرات مخصصة */
-        .page-banner { background-color: #000; background-size: cover; background-position: center; width: 100%; min-height: 200px; height: 25vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; border-bottom: 2px solid var(--gold); }
-        .page-banner h1 { font-size: 28px; color: var(--gold); font-weight: 900; margin-bottom: 5px; text-shadow: 0 0 15px rgba(212,175,55,0.6); }
-        .page-banner p { color: #ddd; font-size: 14px; }
-
-        /* الأزرار */
+        /* حاوية البانر الديناميكي */
+        .dynamic-banner-container {
+            width: 100%;
+            min-height: 200px;
+            background: #000;
+            position: relative;
+            border-bottom: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .dynamic-banner-container img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+        }
+        
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-family: inherit; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .btn-pink { background: linear-gradient(135deg, var(--pink), var(--pink-dark)); color: white; box-shadow: 0 4px 15px rgba(233,30,99,0.4); }
         .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(233,30,99,0.6); }
         .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
         .btn-outline:hover { background: var(--gold); color: black; }
         
-        /* الأقسام الدائرية */
         .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; padding: 20px 5%; }
         .category-item { text-align: center; cursor: pointer; }
         .category-icon { width: 75px; height: 75px; margin: 0 auto 8px; border-radius: 50%; border: 2px solid var(--gold); background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); transition: 0.3s; }
@@ -81,7 +90,6 @@
         .category-item:hover .category-icon { border-color: var(--pink); box-shadow: 0 0 20px rgba(233,30,99,0.5); transform: scale(1.05); }
         .category-item h4 { font-size: 11px; color: #ddd; }
         
-        /* المنتجات */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 20px 5%; }
         .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
         .product-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
@@ -97,7 +105,6 @@
         .btn-add { background: #222; color: var(--gold); border: 1px solid var(--gold) !important; }
         .btn-buy { background: var(--pink); color: white; }
 
-        /* تفاصيل المنتج */
         .product-details { padding: 20px 5%; }
         .main-image { width: 100%; height: 300px; background: #111; border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; position: relative; }
         .main-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
@@ -110,7 +117,6 @@
         .qty-btn { width: 35px; height: 35px; border-radius: 5px; background: #222; color: white; border: 1px solid var(--border-color); cursor: pointer; font-size: 18px; }
         .qty-input { width: 50px; text-align: center; background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; }
 
-        /* السلة والمفضلة */
         .cart-item { display: flex; gap: 15px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 15px; align-items: center; }
         .cart-item img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); }
         .cart-item-info { flex: 1; }
@@ -120,14 +126,12 @@
         .qty-controls button { width: 25px; height: 25px; border-radius: 5px; background: #333; color: white; border: none; cursor: pointer; }
         .remove-btn { color: #ff4d4d; background: transparent; border: none; font-size: 18px; cursor: pointer; }
 
-        /* الدفع */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--gold); }
         .form-group input { width: 100%; padding: 12px; background: #111; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-family: inherit; }
         .form-group input:focus { border-color: var(--pink); outline: none; }
         .payment-method { border: 1px solid var(--pink); background: rgba(233,30,99,0.1); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         
-        /* تتبع الطلب */
         .tracking-steps { display: flex; justify-content: space-between; position: relative; margin: 30px 0; }
         .tracking-steps::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: #333; z-index: 1; }
         .step { position: relative; z-index: 2; text-align: center; width: 25%; }
@@ -137,7 +141,6 @@
         .step p { font-size: 10px; color: #777; }
         .step.active p { color: white; font-weight: bold; }
 
-        /* حسابي */
         .menu-list { padding: 0 5%; }
         .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
         .menu-item:hover { border-color: var(--gold); }
@@ -146,14 +149,12 @@
         .menu-text h4 { font-size: 14px; margin-bottom: 3px; }
         .menu-text p { font-size: 11px; color: var(--text-muted); }
 
-        /* الأسئلة الشائعة */
         .faq-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .faq-question { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; font-size: 13px; }
         .faq-answer { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
         .faq-item.active .faq-answer { padding: 0 15px 15px; max-height: 200px; }
         .faq-item.active .faq-question i { transform: rotate(180deg); color: var(--pink); }
 
-        /* شريط التنقل السفلي */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1500; }
         .nav-item { text-align: center; color: #777; font-size: 11px; cursor: pointer; transition: 0.3s; width: 20%; }
         .nav-item i { display: block; font-size: 20px; margin-bottom: 3px; }
@@ -190,7 +191,6 @@
         </div>
     </header>
 
-    <!-- القائمة الجانبية -->
     <div class="side-menu-overlay" onclick="toggleMenu()"></div>
     <div class="side-menu">
         <h3>أقسام المتجر</h3>
@@ -208,7 +208,7 @@
     <!-- 1. الصفحة الرئيسية -->
     <div id="page-home" class="page-section active">
         <!-- حاوية البانر الديناميكي -->
-        <div class="dynamic-banner-container" id="dynamicBannerHome" style="background: url('https://raw.githubusercontent.com/salmkasm7358-cell/boutique-store/refs/heads/main/IMG-20261006-WA0000(1).jpg') center/cover no-repeat; min-height: 200px; border-bottom: 2px solid var(--gold);"></div>
+        <div class="dynamic-banner-container" id="dynamicBannerHome"></div>
 
         <div class="container mt-3">
             <h2 style="color:var(--gold); font-size:16px; margin-bottom:10px;"><i class="fa-solid fa-fire"></i> تسوق حسب القسم</h2>
@@ -224,19 +224,19 @@
         </div>
     </div>
 
-    <!-- 2. صفحة الأقسام -->
+    <!-- 2. الأقسام -->
     <div id="page-categories" class="page-section">
-        <div class="page-banner" style="background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');"></div>
+        <div class="dynamic-banner-container" id="dynamicBannerCategories" style="min-height: 120px;"></div>
         <div class="categories-grid" id="allCategoriesPage" style="padding:30px 5%;"></div>
     </div>
 
     <!-- 3. جميع المنتجات -->
     <div id="page-shop" class="page-section">
-        <div class="page-banner" style="background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');"></div>
+        <div class="dynamic-banner-container" id="dynamicBannerShop" style="min-height: 120px;"></div>
         <div class="products-grid" id="shopAllProducts"></div>
     </div>
 
-    <!-- صفحة البحث -->
+    <!-- البحث -->
     <div id="page-search" class="page-section">
         <div class="container mt-3">
             <div style="position:relative; margin-bottom:20px;">
@@ -250,6 +250,12 @@
     <!-- 4. تفاصيل المنتج -->
     <div id="page-product" class="page-section">
         <div class="container mt-3">
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:15px;">
+                <span onclick="showPage('home')" style="cursor:pointer;">الرئيسية</span> <i class="fa-solid fa-chevron-left" style="font-size:8px;"></i> 
+                <span onclick="showPage('shop')" style="cursor:pointer;">جميع المنتجات</span> <i class="fa-solid fa-chevron-left" style="font-size:8px;"></i> 
+                <span id="breadcrumbName">اسم المنتج</span>
+            </div>
+            
             <div class="product-details" style="padding:0;">
                 <div class="main-image">
                     <img id="pdMainImage" src="" alt="Product">
@@ -292,19 +298,19 @@
         </div>
     </div>
 
-    <!-- 5. سلة المشتريات -->
+    <!-- 5. السلة -->
     <div id="page-cart" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>سلة المشتريات</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerCart" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">سلة المشتريات</h1>
         </div>
         <div class="container mt-3" id="cartItemsContainer"></div>
         <div class="container mt-3 mb-3" id="cartSummaryContainer"></div>
     </div>
 
-    <!-- 6. إتمام الطلب -->
+    <!-- 6. الدفع -->
     <div id="page-checkout" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>إتمام الطلب</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerCheckout" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">إتمام الطلب</h1>
         </div>
         <div class="container mb-3">
             <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px;">
@@ -322,17 +328,24 @@
                     <i class="fa-solid fa-circle-check" style="color:var(--pink); margin-right:auto; font-size:18px;"></i>
                 </div>
             </div>
+            <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px;">
+                <h3 style="color:var(--gold); font-size:14px; margin-bottom:10px;"><i class="fa-solid fa-receipt"></i> ملخص الطلب</h3>
+                <div id="checkoutSummaryItems"></div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px; color:#ccc;"><span>المجموع الفرعي</span><span id="coSubtotal">0 ريال</span></div>
+                <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:13px; color:#ccc;"><span>رسوم التوصيل</span><span style="color:var(--pink);">مجاني</span></div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px solid #333; font-size:16px; font-weight:bold; color:var(--gold);"><span>المجموع الكلي</span><span id="coTotal">0 ريال</span></div>
+            </div>
             <button class="btn btn-pink" id="submitOrderBtn" style="width:100%; padding:15px; font-size:16px;" onclick="submitOrder()"><i class="fa-solid fa-lock"></i> تأكيد الطلب</button>
         </div>
     </div>
 
-    <!-- 7. تأكيد الطلب بنجاح -->
+    <!-- 7. النجاح -->
     <div id="page-success" class="page-section">
-        <div class="page-banner" style="min-height: 180px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <div style="width:60px; height:60px; border-radius:50%; border:2px solid var(--pink); display:flex; align-items:center; justify-content:center; margin-bottom:15px; position:relative;">
+        <div class="dynamic-banner-container" style="min-height: 180px;">
+            <div style="width:60px; height:60px; border-radius:50%; border:2px solid var(--pink); display:flex; align-items:center; justify-content:center; margin-bottom:15px; position:relative; z-index:2;">
                 <i class="fa-solid fa-check" style="font-size:30px; color:var(--pink);"></i>
             </div>
-            <h1 style="color:var(--gold);">تم استلام طلبك بنجاح</h1>
+            <h1 style="color:var(--gold); font-size:24px; position:relative; z-index:2;">تم استلام طلبك بنجاح</h1>
         </div>
         
         <div class="container mt-3 mb-3" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:20px;">
@@ -355,10 +368,10 @@
         </div>
     </div>
 
-    <!-- 8. تتبع الطلب -->
+    <!-- 8. التتبع -->
     <div id="page-tracking" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>تتبع طلبك</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerTracking" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">تتبع طلبك</h1>
         </div>
         <div class="container mt-3 mb-3" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:20px;">
              <div class="tracking-steps">
@@ -372,8 +385,8 @@
 
     <!-- 9. حسابي -->
     <div id="page-account" class="page-section">
-        <div class="page-banner" style="min-height: 120px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>مرحباً بك</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerAccount" style="min-height: 120px;">
+             <h1 style="color:var(--gold); font-size:24px; position:relative; z-index:2;">مرحباً بك</h1>
         </div>
         
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px 5%;">
@@ -390,37 +403,38 @@
         </div>
 
         <div class="menu-list mb-3">
-            <div class="menu-item" onclick="showPage('tracking')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-box"></i></div><div class="menu-text"><h4>الطلبات</h4></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
-            <div class="menu-item" onclick="showPage('wishlist')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-regular fa-heart"></i></div><div class="menu-text"><h4>المفضلة</h4></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
-            <div class="menu-item" onclick="showPage('faq')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div><div class="menu-text"><h4>الأسئلة الشائعة</h4></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
-            <div class="menu-item" onclick="showPage('contact')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-headset"></i></div><div class="menu-text"><h4>تواصل معنا</h4></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
+            <div class="menu-item" onclick="showPage('tracking')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-box"></i></div><div class="menu-text"><h4>الطلبات</h4><p>عرض وإدارة طلباتك</p></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
+            <div class="menu-item" onclick="showPage('wishlist')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-regular fa-heart"></i></div><div class="menu-text"><h4>المفضلة</h4><p>المنتجات التي قمت بحفظها</p></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
+            <div class="menu-item" onclick="showPage('faq')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div><div class="menu-text"><h4>الأسئلة الشائعة</h4><p>كل ما تحتاج لمعرفته</p></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
+            <div class="menu-item" onclick="showPage('contact')"><div class="menu-item-right"><div class="menu-icon"><i class="fa-solid fa-headset"></i></div><div class="menu-text"><h4>تواصل معنا</h4><p>تحدث مع مستشارك</p></div></div><i class="fa-solid fa-chevron-left" style="color:#777;"></i></div>
         </div>
     </div>
 
     <!-- 10. المفضلة -->
     <div id="page-wishlist" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>المفضلة</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerWishlist" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">المفضلة</h1>
         </div>
         <div class="container mt-3 mb-3" id="wishlistItemsContainer"></div>
     </div>
 
     <!-- 11. الأسئلة الشائعة -->
     <div id="page-faq" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>الأسئلة الشائعة</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerFaq" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">الأسئلة الشائعة</h1>
         </div>
         <div class="container mt-3">
-            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">الطلبات والشحن <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">معلومات عن الطلبات، الشحن، والتوصيل.</div></div>
-            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">طرق الدفع <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">نوفر الدفع عند الاستلام.</div></div>
-            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">المنتجات <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">جميع منتجاتنا أصلية 100%.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">الطلبات والشحن <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">معلومات عن الطلبات، الشحن، والتوصيل. نشحن لجميع مناطق المملكة خلال 2-5 أيام عمل.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">طرق الدفع <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">خيارات الدفع المتوفرة وكيفية السداد. نوفر الدفع عند الاستلام والتحويل البنكي.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">المنتجات <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">تفاصيل المنتجات، الاستخدام، والضمان. جميع منتجاتنا أصلية 100% وآمنة.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">الإرجاع والاستبدال <i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer">شروط وخطوات الإرجاع أو الاستبدال. يمكنك الإرجاع خلال 3 أيام بشرط عدم فتح التغليف.</div></div>
         </div>
     </div>
 
     <!-- 12. التواصل -->
     <div id="page-contact" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>تواصل معنا</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerContact" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">تواصل معنا</h1>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px 5%;">
             <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:15px; text-align:center;">
@@ -438,16 +452,15 @@
 
     <!-- 13. من نحن -->
     <div id="page-about" class="page-section">
-        <div class="page-banner" style="min-height: 100px; background-image: url('https://i.ibb.co/6P5Z8xK/1000409336.jpg');">
-            <h1>من نحن</h1>
+        <div class="dynamic-banner-container" id="dynamicBannerAbout" style="min-height: 100px;">
+            <h1 style="color:var(--gold); font-size:22px; position:relative; z-index:2;">من نحن</h1>
         </div>
         <div class="container mt-3 mb-3" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:20px; line-height:1.8; font-size:13px; color:#ccc;">
             <h2 style="color:var(--gold); font-size:16px; margin-bottom:10px;">👑 مرحباً بك في بوتيك السعادة</h2>
-            <p>بوتيك السعادة هو متجرك الموثوق لمستلزمات الأزواج وتجارب العلاقة الزوجية.</p>
+            <p>بوتيك السعادة هو متجرك الموثوق لمستلزمات الأزواج وتجارب العلاقة الزوجية. تأسسنا برؤية واضحة: توفير منتجات أصلية عالية الجودة بسرية تامة واحترام كامل لخصوصية عملائنا.</p>
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي -->
     <div class="bottom-nav">
         <div class="nav-item active" id="nav-home" onclick="showPage('home')"><i class="fa-solid fa-house"></i>الرئيسية</div>
         <div class="nav-item" id="nav-categories" onclick="showPage('categories')"><i class="fa-solid fa-table-cells-large"></i>الأقسام</div>
@@ -512,51 +525,88 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        /* ========== 4. تحميل البيانات ========== */
+        /* ========== 4. تحميل الإعدادات (الألوان والخلفيات والبانرات) ========== */
+        async function loadSettings() {
+            try {
+                // 1. الألوان والخلفية
+                const doc = await db.collection("settings").doc("appearance").get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    if(data.primaryColor) document.documentElement.style.setProperty('--gold', data.primaryColor);
+                    if(data.bgColor) document.documentElement.style.setProperty('--bg-dark', data.bgColor);
+                    if(data.bgImage) document.body.style.backgroundImage = `url(${data.bgImage})`;
+                }
+
+                // 2. البانرات (جلب مبسط لتجنب الأخطاء)
+                const bannerSnap = await db.collection("banners").get();
+                let allBanners = bannerSnap.docs.map(d => ({id: d.id, ...d.data()}));
+                
+                // فلترة وترتيب
+                let activeBanners = allBanners.filter(b => b.status === 'active');
+                activeBanners.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                // دالة مساعدة لوضع البانر في مكانه
+                const setBanner = (containerId, location) => {
+                    const container = document.getElementById(containerId);
+                    if(!container) return;
+                    const b = activeBanners.find(x => x.location === location);
+                    if(b) {
+                        container.innerHTML = b.link ? `<a href="${b.link}"><img src="${b.image}"></a>` : `<img src="${b.image}">`;
+                    } else {
+                        container.style.display = 'none'; // إخفاء إذا لم يوجد بانر
+                    }
+                };
+
+                // توزيع البانرات على الصفحات
+                setBanner('dynamicBannerHome', 'home');
+                setBanner('dynamicBannerShop', 'shop');
+                setBanner('dynamicBannerCategories', 'categories');
+                setBanner('dynamicBannerCart', 'cart');
+                setBanner('dynamicBannerCheckout', 'checkout');
+                setBanner('dynamicBannerTracking', 'tracking');
+                setBanner('dynamicBannerAccount', 'account');
+                setBanner('dynamicBannerWishlist', 'wishlist');
+                setBanner('dynamicBannerFaq', 'faq');
+                setBanner('dynamicBannerContact', 'contact');
+                setBanner('dynamicBannerAbout', 'about');
+
+            } catch(err) { 
+                console.log("Error loading settings:", err); 
+                // في حال حدوث خطأ، إظهار الصورة الافتراضية للرئيسية
+                document.getElementById('dynamicBannerHome').innerHTML = `<img src="https://i.ibb.co/6P5Z8xK/1000409336.jpg">`;
+            }
+        }
+
+        /* ========== 5. تحميل البيانات (منتجات وأقسام) ========== */
         async function loadData() {
             try {
-                // جلب الأقسام
                 const catSnap = await db.collection("categories").get();
                 categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                categories = categories.filter(c => c.status === 'active');
-                categories.sort((a, b) => (a.order || 0) - (b.order || 0));
+                categories = categories.filter(c => c.status === 'active').sort((a, b) => (a.order || 0) - (b.order || 0));
 
                 const catHtml = categories.map(cat => {
                     const img = cat.image ? `<img src="${cat.image}">` : `<i class="fa-solid fa-box" style="font-size:24px; color:var(--gold);"></i>`;
-                    return `
-                        <div class="category-item" onclick="goToCategory('${cat.name}')">
-                            <div class="category-icon">${img}</div>
-                            <h4>${cat.name}</h4>
-                        </div>
-                    `;
+                    return `<div class="category-item" onclick="goToCategory('${cat.name}')"><div class="category-icon">${img}</div><h4>${cat.name}</h4></div>`;
                 }).join('');
 
                 document.getElementById('homeCategories').innerHTML = catHtml || '<div style="color:#777; width:100%; text-align:center;">لا توجد أقسام</div>';
                 document.getElementById('allCategoriesPage').innerHTML = catHtml || '<div style="color:#777; width:100%; text-align:center;">لا توجد أقسام</div>';
                 document.getElementById('sideMenuCategories').innerHTML = categories.map(c => `<li onclick="goToCategory('${c.name}')">${c.name} <i class="fa-solid fa-chevron-left" style="font-size:10px;"></i></li>`).join('');
 
-                // جلب المنتجات
                 const prodSnap = await db.collection("products").get();
                 products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                products.sort((a, b) => {
-                    const timeA = a.createdAt ? a.createdAt.seconds : 0;
-                    const timeB = b.createdAt ? b.createdAt.seconds : 0;
-                    return timeB - timeA;
-                });
+                products.sort((a, b) => ((b.createdAt ? b.createdAt.seconds : 0) - (a.createdAt ? a.createdAt.seconds : 0)));
                 
                 renderHomeBestSellers();
                 renderShopProducts(products);
 
-            } catch(err) {
-                console.error("Error loading data:", err);
+            } catch(err) { 
+                console.log("Error loading data:", err); 
                 document.getElementById('homeCategories').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#777;">حدث خطأ في تحميل الأقسام</div>';
-                document.getElementById('homeBestSellers').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#777;">حدث خطأ في تحميل المنتجات</div>';
             }
         }
 
-        /* ========== 5. عرض المنتجات ========== */
+        /* ========== 6. عرض المنتجات ========== */
         function renderHomeBestSellers() {
             const bestSellers = products.slice(0, 4);
             document.getElementById('homeBestSellers').innerHTML = bestSellers.map(createProductCard).join('');
@@ -601,7 +651,7 @@
             showPage('shop');
         }
 
-        /* ========== 6. البحث ========== */
+        /* ========== 7. البحث ========== */
         function performSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             if(query.length < 1) {
@@ -617,7 +667,7 @@
             }
         }
 
-        /* ========== 7. تفاصيل المنتج ========== */
+        /* ========== 8. تفاصيل المنتج ========== */
         function openProductDetails(id) {
             const p = products.find(x => x.id === id);
             if(!p) return;
@@ -659,7 +709,7 @@
             document.getElementById('pdWishlistIcon').className = isFav ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
         }
 
-        /* ========== 8. السلة والمفضلة ========== */
+        /* ========== 9. السلة والمفضلة ========== */
         function addToCart(id, showMsg = true) {
             const p = products.find(x => x.id === id);
             if(!p) return;
@@ -764,7 +814,7 @@
             showToast('تم الحذف من السلة');
         }
 
-        /* ========== 9. إتمام الطلب ========== */
+        /* ========== 10. إتمام الطلب ========== */
         function renderCheckout() {
             let total = 0;
             const itemsHtml = cart.map(item => {
@@ -829,7 +879,7 @@
             }
         }
 
-        /* ========== 10. المفضلة ========== */
+        /* ========== 11. المفضلة ========== */
         function renderWishlist() {
             const container = document.getElementById('wishlistItemsContainer');
             document.getElementById('wishlistCountText').textContent = wishlist.length;
@@ -870,7 +920,7 @@
             }
         }
 
-        /* ========== 11. أدوات إضافية ========== */
+        /* ========== 12. أدوات إضافية ========== */
         function toggleFaq(el) {
             el.classList.toggle('active');
         }
@@ -879,12 +929,13 @@
             document.getElementById('accWishlistCount').textContent = wishlist.length;
         }
 
-        /* ========== 12. التشغيل ========== */
+        /* ========== 13. التشغيل ========== */
         document.addEventListener('DOMContentLoaded', () => {
             updateCartBadge();
             updateAccountStats();
-            loadData();
+            loadSettings(); // تحميل الألوان والبانرات أولاً
+            loadData();     // ثم تحميل المنتجات
         });
     </script>
 </body>
-    </html>
+</html>
